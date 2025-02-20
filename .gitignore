@@ -1,0 +1,15 @@
+# Dependencias de Node.js
+node_modules/
+package-lock.json
+yarn.lock
+
+# Archivos de compilación
+dist/
+build/
+.cache/
+
+# Archivos del editor de código
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
