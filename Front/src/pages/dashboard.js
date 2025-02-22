@@ -6,7 +6,7 @@ function dashboard() {
   return (
     <>
       <Header />
-
+        <Grid/>
       <Footer />
 
       </>
