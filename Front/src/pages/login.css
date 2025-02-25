@@ -1,0 +1,115 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #f5f0ff 0%, #ffffff 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Background pattern */
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M15 12L20 17L25 12' stroke='%236C5CE7' stroke-opacity='0.1' stroke-width='2'/%3E%3C/svg%3E");
+    background-size: 80px 80px;
+    opacity: 0.5;
+    z-index: 0;
+}
+
+.login-container {
+    background: rgb(255, 255, 255);
+    padding: 40px;
+    border-radius: 50px;
+    width: 600px; /* Aumento el ancho del contenedor */
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    backdrop-filter: blur(10px);
+}
+.logo {
+    margin-bottom: 40px;
+    color: #6C5CE7;
+    font-size: 28px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.logo-icon {
+    font-size: 24px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    margin-left: 20px;
+
+}
+
+.form-group label {
+    display: block; /* Esto asegura que el label esté encima del input */
+    margin-bottom: 8px;
+    color: #6C5CE7;
+    font-size: 14px;
+}
+
+.form-group input {
+    width: 50%; /* Mantengo el tamaño de los inputs */
+    padding: 12px;
+    border: 2px solid #E6E6FA;
+    border-radius: 16px;
+    background: #F8F7FF;
+    color: #333;
+    font-size: 16px;
+    transition: border-color 0.3s;
+    margin: 0 auto; /* Centra el input */
+    display: block; /* Asegura que el input se comporte como un bloque */
+}
+.form-group input:focus {
+    outline: none;
+    border-color: #6C5CE7;
+}
+
+.btn-enter {
+    background: #6C5CE7;
+    color: white;
+    border: none;
+    padding: 12px 40px;
+    border-radius: 16px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 50%; /* Aseguro que el botón ocupe todo el ancho */
+    margin: 0 auto; /* Centra el botón */
+    display: block; /* Asegura que el botón se comporte como un bloque */
+    margin-top: 20px;
+}
+.btn-enter:hover {
+    background: #5849e6;
+}
+
+.signup-link {
+    margin-top: 20px;
+    display: inline-block;
+    color: #6C5CE7;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.signup-link:hover {
+    text-decoration: underline;
+}

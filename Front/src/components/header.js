@@ -9,6 +9,8 @@ const Header = () => {
         <input type="text" className="search-bar" placeholder="Search..." />
       </div>
       <div className="right-section">
+        <button className="btn login-btn">Iniciar sesión</button>
+        <button className="btn register-btn">Registrarse</button>
         <span className="star-icon">★</span>
         <div className="avatar">
           <img 
