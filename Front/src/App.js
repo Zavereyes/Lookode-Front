@@ -1,16 +1,19 @@
-import logo from './logo.svg';
-import React, { useEffect, useRef,  useState } from 'react';
-import './App.css';
+// App.js
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
 import Dashboard from './pages/dashboard.js';
-import Login from './pages/login.js';
-import Perfil from './pages/perfil.js';
-
-
+//import Header from './header.js'; // si deseas usar el Header en todas las páginas
+import Login from './pages/login.js'; 
 
 function App() {
   return (
-
-        <Dashboard />
+<>
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/login" element={<Login />} />
+        
+      </Routes>
+</>
   );
 }
 

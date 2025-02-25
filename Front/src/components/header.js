@@ -1,5 +1,6 @@
 import React from 'react';
 import './header.css';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   return (
@@ -9,8 +10,8 @@ const Header = () => {
         <input type="text" className="search-bar" placeholder="Search..." />
       </div>
       <div className="right-section">
-        <button className="btn login-btn">Iniciar sesión</button>
-        <button className="btn register-btn">Registrarse</button>
+      <Link to="/login" className="btn login-btn">Iniciar sesión</Link>
+      <Link to="/register" className="btn register-btn">Registrarse</Link>
         <span className="star-icon">★</span>
         <div className="avatar">
           <img 

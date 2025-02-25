@@ -17,7 +17,7 @@ function perfil(){
         <PerfilHeader />
 
 
-
+        <Footer />
         </>
 
     );
