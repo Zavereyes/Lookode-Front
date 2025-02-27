@@ -9,6 +9,7 @@ body {
 }
 
 .header {
+    width: 100vw; /* Asegura que ocupa todo el ancho de la pantalla */
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -16,6 +17,7 @@ body {
     background: linear-gradient(to right, #f3e7fe, #ffe7fe);
     height: 70px;
 }
+
 
 .logo {
     color: #6366f1;

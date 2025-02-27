@@ -13,7 +13,8 @@ const Header = () => {
       <Link to="/login" className="btn login-btn">Iniciar sesión</Link>
       <Link to="/register" className="btn register-btn">Registrarse</Link>
         <span className="star-icon">★</span>
-        <div className="avatar">
+        <Link to="/perfil">
+        <div className="avatar" style={{ cursor: "pointer" }}>
           <img 
             src="/zave.jpg" 
             alt="Avatar" 
@@ -22,6 +23,7 @@ const Header = () => {
             style={{ borderRadius: '50%' }} 
           />
         </div>
+      </Link>
       </div>
     </header>
   );

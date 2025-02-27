@@ -4,10 +4,17 @@ import './perfilheader.css';
 const PerfilHeader = () => {
   // Estado para manejar el botón activo
   const [activeButton, setActiveButton] = useState(null);
+  const [displayText, setDisplayText] = useState(''); // Estado para mostrar el texto
 
   const handleButtonClick = (buttonId) => {
-    // Cambiar el botón activo según el id
     setActiveButton(buttonId);
+    
+    // Cambia el texto según el botón seleccionado
+    if (buttonId === 'button1') {
+      setDisplayText('Creados');
+    } else if (buttonId === 'button2') {
+      setDisplayText('Favoritos');
+    }
   };
 
   return (
@@ -37,6 +44,8 @@ const PerfilHeader = () => {
             +
           </button>
         </div>
+        {/* Se muestra el texto debajo si hay uno seleccionado */}
+        <div className="text-display">{displayText}</div>
       </div>
     </>
   );
