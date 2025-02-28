@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 const Header = () => {
   return (
     <header className="header">
-      <a href="#" className="logo">&lt;/&gt;</a>
+     <Link to="/dashboard"> <a href="#" className="logo">&lt;/&gt;</a></Link>
       <div className="search-container">
         <input type="text" className="search-bar" placeholder="Search..." />
       </div>

@@ -1,0 +1,93 @@
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f0ff;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: block; /* Quitamos el flex para que no se centre todo */
+        }
+
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 80%; /* Que ocupe todo el ancho disponible */
+            padding: 20px;
+            margin: 80px auto 0; /* Le damos espacio para que no se junte con el header */
+            box-sizing: border-box; /* Por si acaso */
+        }
+
+        .upload-area {
+            background-color: #e9e0f7;
+            width: 300px;
+            height: 250px;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 30px;
+        }
+
+        .form-area {
+            flex: 1;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        .form-label {
+            font-size: 20px;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .form-label span {
+            color: #6c5ce7;
+            
+        }
+
+        .form-input {
+            
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            background-color: #e9e0f7;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+
+        .btn {
+            padding: 10px 30px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .btn-upload {
+            background-color: #6c5ce7;
+            color: white;
+        }
+
+        .btn-exit {
+            background-color: #222;
+            color: white;
+        }
+
+        .btn-continue {
+            background-color: #6c5ce7;
+            color: white;
+        }

@@ -1,0 +1,60 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f5f5f5;
+  }
+  
+  .button {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #f0e6ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  
+  .button:hover {
+    transform: scale(1.05);
+  }
+  
+  .star {
+    color: #6247aa;
+    font-size: 18px;
+  }
+  
+  /* Create the four-point star shape */
+  .star-icon {
+    width: 16px;
+    height: 16px;
+    position: relative;
+  }
+  
+  .star-icon::before,
+  .star-icon::after {
+    content: '';
+    position: absolute;
+    background-color: #6247aa;
+  }
+  
+  .star-icon::before {
+    width: 16px;
+    height: 4px;
+    top: 6px;
+    left: 0;
+    border-radius: 2px;
+  }
+  
+  .star-icon::after {
+    width: 4px;
+    height: 16px;
+    top: 0;
+    left: 6px;
+    border-radius: 2px;
+  }
