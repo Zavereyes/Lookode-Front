@@ -1,6 +1,4 @@
 import React from 'react';
-import './formulariopryct.css';
-import { Link } from 'react-router-dom';
 import './botoncrear.css';
 
 

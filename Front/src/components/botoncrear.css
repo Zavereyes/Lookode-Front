@@ -18,7 +18,12 @@ body {
     border: none;
     cursor: pointer;
     transition: transform 0.2s;
+    position: fixed; /* Mantiene el botón fijo en la pantalla */
+    bottom: 20px;    /* Ajusta la distancia desde la parte inferior */
+    right: 20px;      /* Ajusta la distancia desde la parte izquierda */
+    z-index: 1000;   /* Asegura que el botón esté por encima de otros elementos */
   }
+  
   
   .button:hover {
     transform: scale(1.05);

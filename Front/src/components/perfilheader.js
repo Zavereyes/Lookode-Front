@@ -31,18 +31,18 @@ const PerfilHeader = () => {
         </div>
         <div className="username">ZAVEREYES</div>
         <div className="buttons-container">
-          <button 
-            className={`button ${activeButton === 'button1' ? 'active' : ''}`} 
+      <button 
+            className={`perfil-button ${activeButton === 'button1' ? 'active' : ''}`} 
             onClick={() => handleButtonClick('button1')}
           >
             &lt;&gt;
           </button>
           <button 
-            className={`button ${activeButton === 'button2' ? 'active' : ''}`} 
+            className={`perfil-button ${activeButton === 'button2' ? 'active' : ''}`} 
             onClick={() => handleButtonClick('button2')}
           >
-            +
-          </button>
+            
+      </button>
         </div>
         {/* Se muestra el texto debajo si hay uno seleccionado */}
         <div className="text-display">{displayText}</div>

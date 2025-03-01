@@ -6,6 +6,9 @@ import Dashboard from './pages/dashboard.js';
 import Login from './pages/login.js'; 
 import Perfil from './pages/perfil.js';
 import Editarpryct from './pages/editarpryct.js';
+import Crearpryct from './pages/crearpryct.js';
+import Registro from './pages/registro.js';
+
 
 
 function App() {
@@ -16,9 +19,11 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/perfil" element={<Perfil />} />
         <Route path="/editarpryct" element={<Editarpryct />} />
+        <Route path="/crearpryct" element={<Crearpryct />} />
+        <Route path="/registro" element={<Registro />} />
 
 
-        
+
       </Routes>
 </>
   );

@@ -3,7 +3,7 @@ import './formulariopryct.css';
 import { Link } from 'react-router-dom';
 
 
-const Formularioprcyt = ({ showContinuarButton = true }) => {
+const Formularioprcyt = ({ showContinuarButton = true ,  showEditarButton = true , showEliminarButton = true }) => {
     return(
         <div className="container">
             <div className="upload-area">
@@ -24,8 +24,8 @@ const Formularioprcyt = ({ showContinuarButton = true }) => {
                 <div className="button-container">
                 <Link to ="/perfil"> <button className="btn btn-exit">Salir</button></Link>
                     {showContinuarButton && <button className="btn btn-continue">Continuar</button>}
-                     <button className="btn btn-eliminar">Eliminar</button> 
-                    <button className="btn btn-editar">Editar</button>
+                    {showEliminarButton && <button className="btn btn-eliminar">Eliminar</button>}
+                    {showEditarButton && <button className="btn btn-editar">Editar</button>}
                 </div>
             </div>
         </div>

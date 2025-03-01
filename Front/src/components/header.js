@@ -11,7 +11,7 @@ const Header = () => {
       </div>
       <div className="right-section">
       <Link to="/login" className="btn login-btn">Iniciar sesión</Link>
-      <Link to="/register" className="btn register-btn">Registrarse</Link>
+      <Link to="/registro" className="btn register-btn">Registrarse</Link>
         <span className="star-icon">★</span>
         <Link to="/perfil">
         <div className="avatar" style={{ cursor: "pointer" }}>
