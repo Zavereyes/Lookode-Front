@@ -14,8 +14,10 @@ function Grid({ showEditButton = false }) {
       {images.map((src, index) => (
         <div key={index} className="grid-item">
           <img src={src} alt="Proyecto" />
-          <Link to="/editarpryct"> {showEditButton && <button className="edit-button"> e </button>}</Link>
+          <Link to="/editarpryct"> {showEditButton && <button className="edit-button">             &lt;&gt;
+            </button>}</Link>
         </div>
+        
       ))}
     </div>
   );

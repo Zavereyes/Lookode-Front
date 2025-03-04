@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import './perfilheader.css';
+import { Link } from 'react-router-dom';
 
-const PerfilHeader = () => {
+const PerfilHeader = ({showViewsButton = true}) => {
   // Estado para manejar el botón activo
   const [activeButton, setActiveButton] = useState(null);
   const [displayText, setDisplayText] = useState(''); // Estado para mostrar el texto
@@ -9,7 +10,7 @@ const PerfilHeader = () => {
   const handleButtonClick = (buttonId) => {
     setActiveButton(buttonId);
     
-    // Cambia el texto según el botón seleccionado
+  
     if (buttonId === 'button1') {
       setDisplayText('Creados');
     } else if (buttonId === 'button2') {
@@ -20,7 +21,7 @@ const PerfilHeader = () => {
   return (
     <>
       <div className="profile-container">
-        <div className="logo">
+        <Link to = "/editarperfil" > <div className="logo">
           <img 
             src="/zave.jpg" 
             alt="Avatar" 
@@ -29,20 +30,23 @@ const PerfilHeader = () => {
             style={{ borderRadius: '50%' }} 
           /> 
         </div>
+        </Link>
+
         <div className="username">ZAVEREYES</div>
+        
         <div className="buttons-container">
-      <button 
+        {showViewsButton && <button 
             className={`perfil-button ${activeButton === 'button1' ? 'active' : ''}`} 
             onClick={() => handleButtonClick('button1')}
           >
             &lt;&gt;
-          </button>
-          <button 
+          </button>}
+          {showViewsButton &&<button 
             className={`perfil-button ${activeButton === 'button2' ? 'active' : ''}`} 
             onClick={() => handleButtonClick('button2')}
           >
-            
-      </button>
+            &lt;3
+      </button>}
         </div>
         {/* Se muestra el texto debajo si hay uno seleccionado */}
         <div className="text-display">{displayText}</div>

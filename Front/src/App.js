@@ -8,6 +8,10 @@ import Perfil from './pages/perfil.js';
 import Editarpryct from './pages/editarpryct.js';
 import Crearpryct from './pages/crearpryct.js';
 import Registro from './pages/registro.js';
+import EditarPerfil from './pages/editarperfil.js';
+import Addcontentpryct from './pages/addcontentpryct.js';
+
+
 
 
 
@@ -21,6 +25,11 @@ function App() {
         <Route path="/editarpryct" element={<Editarpryct />} />
         <Route path="/crearpryct" element={<Crearpryct />} />
         <Route path="/registro" element={<Registro />} />
+        <Route path="/editarperfil" element={<EditarPerfil />} />
+        <Route path="/addcontentpryct" element={<Addcontentpryct />} />
+
+
+
 
 
 

@@ -7,13 +7,16 @@ function Registro() {
     return (
         <>
             <Header />
-            <div className="background-pattern"></div>
-            <div className="container">
             
+            <PerfilHeader showViewsButton = {false} />
 
-                <Formulariodatos   showGuardarButton ={false}/>
+            <div className="background-pattern"></div>
+                <div className="container">
+                  
+                    <Formulariodatos  showRegistrarButton ={false}  showLookodeLogo = {false} />
 
-            </div>
+                </div>
+
         </>
     );
 }

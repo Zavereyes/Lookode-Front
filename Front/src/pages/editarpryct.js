@@ -8,6 +8,7 @@ function editarpryct(){
     return(
                 <>
                 <Header />
+                
                     <Formularioprcyt showContinuarButton ={false} />
                 
                 

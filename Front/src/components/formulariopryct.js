@@ -23,7 +23,9 @@ const Formularioprcyt = ({ showContinuarButton = true ,  showEditarButton = true
                 
                 <div className="button-container">
                 <Link to ="/perfil"> <button className="btn btn-exit">Salir</button></Link>
-                    {showContinuarButton && <button className="btn btn-continue">Continuar</button>}
+                <Link to="/addcontentpryct">
+                {showContinuarButton && <button className="btn btn-continue">Continuar</button>}
+                </Link>
                     {showEliminarButton && <button className="btn btn-eliminar">Eliminar</button>}
                     {showEditarButton && <button className="btn btn-editar">Editar</button>}
                 </div>
