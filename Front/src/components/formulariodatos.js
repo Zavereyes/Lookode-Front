@@ -1,60 +1,99 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './formulariodatos.css';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-const Formulariodatos = ({showRegistrarButton = true, showGuardarButton = true, showLookodeLogo = true }) => {
+const Formulariodatos = ({ showRegistrarButton = true, showGuardarButton = true, showLookodeLogo = true }) => {
+    const [nombre, setNombre] = useState('');
+    const [correo, setCorreo] = useState('');
+    const [contra, setContra] = useState('');
+    const [twitter, setTwitter] = useState('');
+    const [ig, setIg] = useState('');
+
+    const [fileImg, setFileImg] = useState(null); 
+    const navigate = useNavigate(); 
+
+    const enviarDatos = (e) => {
+        e.preventDefault(); 
+
+        const formData = new FormData();
+        formData.append("nombre", nombre);
+        formData.append("correo", correo);
+        formData.append("contra", contra);
+        formData.append("twitter", twitter);
+        formData.append("ig", ig);
+
+        if (fileImg) {
+            formData.append("fileImg", fileImg);
+        }
+
+        axios.post("http://localhost:3001/registro", formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        }).then(response => {
+            if (response.data.message  === "registrado") {
+                alert("Usuario registrado con éxito");
+                // Aquí puedes redirigir al usuario a otra página, por ejemplo al login
+            } else {
+               // alert("Error al registrar usuario");
+               navigate ('/dashboard');
+
+               
+            }
+        }).catch(error => {
+            console.error(error);
+            alert("Hubo un error al registrar");
+        });
+    };
+
     return (
         <div className="formulariodatos-wrapper">
             <div className="formulariodatos-background-pattern"></div>
             <div className="formulariodatos-container">
-               {showLookodeLogo && <div className="formulariodatos-logo">
+                {showLookodeLogo && <div className="formulariodatos-logo">
                     <span className="formulariodatos-logo-icon">&#10094;&#10095;</span>
                     LOOKODE
-                </div>
-                }
-                <div className="formulariodatos-avatar">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 16L7 11H10V7H14V11H17L12 16Z"/>
-                        <path d="M17 18L19 20M7 18L5 20M7 6L5 4M17 6L19 4" stroke="#7b6cff" strokeWidth="1"/>
-                        <path d="M12 3L12 3.01M3 12L3.01 12M21 12L21.01 12M12 21L12 21.01" stroke="#7b6cff" strokeWidth="2"/>
-                    </svg>
-                </div>
+                </div>}
 
-                <form className="formulariodatos-form">
+                <form className="formulariodatos-form" onSubmit={enviarDatos}>
                     <div className="formulariodatos-form-group">
-                        <label className="formulariodatos-label" htmlFor="usuario">Usuario*</label>
-                        <input className="formulariodatos-input" type="text" id="usuario" required />
+                        <label className="formulariodatos-label" htmlFor="usuario">nickname*</label>
+                        <input className="formulariodatos-input" type="text" id="usuario" required onChange={(e) => setNombre(e.target.value)} />
                     </div>
 
                     <div className="formulariodatos-form-group">
-                        <label className="formulariodatos-label" htmlFor="email">Correo electrónico*</label>
-                        <input className="formulariodatos-input" type="email" id="email" required />
+                        <label className="formulariodatos-label" htmlFor="email">correo electrónico*</label>
+                        <input className="formulariodatos-input" type="email" id="email" required onChange={(e) => setCorreo(e.target.value)} />
                     </div>
 
                     <div className="formulariodatos-form-group">
-                        <label className="formulariodatos-label" htmlFor="password">Contraseña*</label>
-                        <input className="formulariodatos-input" type="password" id="password" required />
+                        <label className="formulariodatos-label" htmlFor="password">contraseña*</label>
+                        <input className="formulariodatos-input" type="password" id="password" required onChange={(e) => setContra(e.target.value)} />
                     </div>
 
                     <div className="formulariodatos-form-group">
-                        <label className="formulariodatos-label" htmlFor="confirm"> X</label>
-                        <input className="formulariodatos-input" type="password" id="confirm" />
+                        <label className="formulariodatos-label" htmlFor="ig">instagram</label>
+                        <input className="formulariodatos-input" type="text" id="ig" onChange={(e) => setIg(e.target.value)} />
                     </div>
 
                     <div className="formulariodatos-form-group">
-                        <label className="formulariodatos-label" htmlFor="instagram">Instagram</label>
-                        <input className="formulariodatos-input" type="text" id="instagram" />
+                        <label className="formulariodatos-label" htmlFor="twitter">x</label>
+                        <input className="formulariodatos-input" type="text" id="twitter" onChange={(e) => setTwitter(e.target.value)} />
+                    </div>
+
+                    <div className="formulariodatos-form-group">
+                        <label className="formulariodatos-label" htmlFor="fileImg">avatar</label>
+                        <input className="formulariodatos-input" type="file" id="fileImg" onChange={(e) => setFileImg(e.target.files[0])} />
                     </div>
 
                     {showRegistrarButton && <button className="formulariodatos-button" type="submit">REGISTRAR</button>}
                     {showGuardarButton && <button className="formulariodatos-button" type="submit">Guardar</button>}
-
                 </form>
 
                 <Link to="/login" className="formulariodatos-login-link">Ya soy Lookoder</Link>
             </div>
         </div>
     );
-}
+};
 
 export default Formulariodatos;
