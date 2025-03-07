@@ -21,10 +21,7 @@ body {
 }
 
 .logo {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    background-color: #FDB813;
+    width: 120px;
     overflow: hidden;
 }
 

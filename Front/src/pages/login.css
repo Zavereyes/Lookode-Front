@@ -10,6 +10,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    align-content: center;
     background: linear-gradient(135deg, #f5f0ff 0%, #ffffff 100%);
     position: relative;
     /*overflow: hidden;*/
@@ -33,12 +34,17 @@ body::before {
     background: rgb(255, 255, 255);
     padding: 40px;
     border-radius: 50px;
-    width: 600px; /* Aumento el ancho del contenedor */
+    width: 600px;
     text-align: center;
-    position: relative;
-    z-index: 1;
+    align-items: center;
+    align-content: center;
+    position: absolute; /* Cambia de relative a absolute */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centrará el contenedor */
     backdrop-filter: blur(10px);
 }
+
 .logo {
     margin-bottom: 40px;
     color: #6C5CE7;
@@ -49,23 +55,23 @@ body::before {
     justify-content: center;
     gap: 8px;
 }
+.logoimg{
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    text-align: center;
 
+}
 .logo-icon {
     font-size: 24px;
 }
 
 .form-group {
     margin-bottom: 20px;
-    margin-left: 20px;
-
+    /* Elimina el margen izquierdo */
+    margin-left: 0;
 }
 
-.form-group label {
-    display: block; /* Esto asegura que el label esté encima del input */
-    margin-bottom: 8px;
-    color: #6C5CE7;
-    font-size: 14px;
-}
 
 .form-group input {
     width: 50%; /* Mantengo el tamaño de los inputs */

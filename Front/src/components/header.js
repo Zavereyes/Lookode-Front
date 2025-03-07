@@ -2,17 +2,23 @@ import React from 'react';
 import './header.css';
 import { Link } from 'react-router-dom';
 
-const Header = () => {
+const Header = ({showSearch = true, showfotoperfil = true}) => {
   return (
     <header className="header">
-     <Link to="/dashboard"  className="Headerlogo">&lt;/&gt;</Link>
-      <div className="search-container">
+     <Link to="/"  className="Headerlogo"><img 
+            src="img_simbolos/LOGO_SIMBOLO.png" 
+            alt="Avatar" 
+            width="40" 
+            height="25" 
+          />
+          </Link>
+          {showSearch && <div className="search-container">
         <input type="text" className="search-bar" placeholder="Search..." />
-      </div>
+      </div>}
       <div className="right-section">
       <Link to="/login" style={{ textDecoration: "none" }} className="btn login-btn">Iniciar sesión</Link>
       <Link to="/registro" style={{ textDecoration: "none" }} className="btn register-btn">Registrarse</Link>
-        <Link to="/perfil">
+        {showfotoperfil && <Link to="/perfil">
         <div className="avatar" style={{ cursor: "pointer" }}>
           <img 
             src="/zave.jpg" 
@@ -22,7 +28,7 @@ const Header = () => {
             style={{ borderRadius: '50%' }} 
           />
         </div>
-      </Link>
+      </Link>}
       </div>
     </header>
   );

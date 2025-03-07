@@ -10,7 +10,7 @@ import Crearpryct from './pages/crearpryct.js';
 import Registro from './pages/registro.js';
 import EditarPerfil from './pages/editarperfil.js';
 import Addcontentpryct from './pages/addcontentpryct.js';
-
+import Viewproyecto from './pages/viewproyecto.js';
 
 
 
@@ -19,7 +19,7 @@ function App() {
   return (
 <>
       <Routes>
-        <Route path="dashboard/" element={<Dashboard />} />
+        <Route path="/" element={<Dashboard />} />
         <Route path="/login" element={<Login />} />
         <Route path="/perfil" element={<Perfil />} />
         <Route path="/editarpryct" element={<Editarpryct />} />
@@ -27,12 +27,7 @@ function App() {
         <Route path="/registro" element={<Registro />} />
         <Route path="/editarperfil" element={<EditarPerfil />} />
         <Route path="/addcontentpryct" element={<Addcontentpryct />} />
-
-
-
-
-
-
+        <Route path="/viewproyecto" element={<Viewproyecto />} />
       </Routes>
 </>
   );

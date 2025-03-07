@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const Formulariodatos = ({ showRegistrarButton = true, showGuardarButton = true, showLookodeLogo = true }) => {
+const Formulariodatos = ({ showRegistrarButton = true, showGuardarButton = true,
+                        showLookodeLogo = true, showLinkLookoder = true}) => {
     const [nombre, setNombre] = useState('');
     const [correo, setCorreo] = useState('');
     const [contra, setContra] = useState('');
@@ -36,7 +37,7 @@ const Formulariodatos = ({ showRegistrarButton = true, showGuardarButton = true,
                 // Aquí puedes redirigir al usuario a otra página, por ejemplo al login
             } else {
                // alert("Error al registrar usuario");
-               navigate ('/dashboard');
+               navigate ('/');
 
                
             }
@@ -51,8 +52,12 @@ const Formulariodatos = ({ showRegistrarButton = true, showGuardarButton = true,
             <div className="formulariodatos-background-pattern"></div>
             <div className="formulariodatos-container">
                 {showLookodeLogo && <div className="formulariodatos-logo">
-                    <span className="formulariodatos-logo-icon">&#10094;&#10095;</span>
-                    LOOKODE
+                    <img 
+            src="img_simbolos/logo_lookode.png" 
+            alt="Avatar" 
+            width="200" 
+            height="27" 
+          />
                 </div>}
 
                 <form className="formulariodatos-form" onSubmit={enviarDatos}>
@@ -90,7 +95,7 @@ const Formulariodatos = ({ showRegistrarButton = true, showGuardarButton = true,
                     {showGuardarButton && <button className="formulariodatos-button" type="submit">Guardar</button>}
                 </form>
 
-                <Link to="/login" className="formulariodatos-login-link">Ya soy Lookoder</Link>
+                {showLinkLookoder && <Link to="/login" className="formulariodatos-login-link">Ya soy Lookoder</Link> }
             </div>
         </div>
     );

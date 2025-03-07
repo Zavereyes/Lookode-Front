@@ -13,7 +13,7 @@ function Registro() {
             <div className="background-pattern"></div>
                 <div className="container">
                   
-                    <Formulariodatos  showRegistrarButton ={false}  showLookodeLogo = {false} />
+                    <Formulariodatos  showRegistrarButton ={false}  showLookodeLogo = {false} showLinkLookoder= {false} />
 
                 </div>
 

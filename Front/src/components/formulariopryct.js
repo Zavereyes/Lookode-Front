@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 
 const Formularioprcyt = ({ showContinuarButton = true ,  showEditarButton = true , showEliminarButton = true }) => {
     return(
+        <div className="main-content">
         <div className="container">
             <div className="upload-area">
                 <button className="btn btn-upload">Cargar</button>
@@ -30,6 +31,7 @@ const Formularioprcyt = ({ showContinuarButton = true ,  showEditarButton = true
                     {showEditarButton && <button className="btn btn-editar">Editar</button>}
                 </div>
             </div>
+        </div>
         </div>
     );
 }

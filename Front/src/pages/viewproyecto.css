@@ -1,0 +1,184 @@
+/* Estilos generales */
+* {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+
+/* Header fijo */
+.header {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background: linear-gradient(to right, #f3e7fe, #ffe7fe);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    z-index: 1000;
+}
+
+/* Logo */
+.Headerlogo img {
+    width: 40px;
+    height: 25px;
+}
+
+/* Barra de búsqueda */
+.search-container {
+    flex: 1;
+    max-width: 600px;
+    margin: 0 2rem;
+}
+
+.search-bar {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 1rem;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+}
+
+/* Botones de sesión */
+.btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.login-btn {
+    background-color: transparent;
+    color: #6366f1;
+    border: 2px solid #6366f1;
+}
+
+.login-btn:hover {
+    background-color: #6366f1;
+    color: white;
+}
+
+.register-btn {
+    background-color: #6366f1;
+    color: white;
+}
+
+.register-btn:hover {
+    background-color: #4f46e5;
+}
+
+/* Avatar */
+.avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+/* Contenido Principal */
+.main-content {
+    padding: 2rem;
+    min-height: 80vh; /* Al menos el 80% de la altura de la ventana */
+}
+
+
+.project-view {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    height: 100%;
+}
+
+
+.main-image img {
+    width: 100%;
+    max-width: 1500px;
+    height: auto; /* Mantén la proporción */
+    border-radius: 16px;
+    min-height: 100px; /* Aumenta la altura mínima para imágenes grandes */
+}
+
+
+.project-details {
+    flex-grow: 1; /* Mantén la sección de detalles más pequeña */
+    background-color: white;
+    padding: 2rem;
+    border-radius: 16px;
+    min-width: 250px;
+}
+
+.avatar-large img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+}
+
+.save-btn {
+    background-color: #6C5CE7;
+    color: white;
+    border-radius: 8px;
+    margin-top: 1rem;
+    padding: 0.5rem 2rem;
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.tags span {
+    background-color: #f3e7fe;
+    padding: 0.25rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #6C5CE7;
+}
+
+.circles {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #6C5CE7;
+}
+
+/* Contenido adicional */
+/* Haz que la sección de contenido sea más grande */
+.additional-content {
+    flex-grow: 2;
+    min-height: 700px; /* Define una altura mínima mayor */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+
+.text-card {
+    background-color: #E6E6FA;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    font-size: 1.25rem;
+    text-align: center;
+}
+
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.image-grid img {
+    width: 100%;
+    border-radius: 16px;
+}

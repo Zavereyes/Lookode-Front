@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import './login.css';
+import Header from '../components/header.js';
+import Footer from '../components/footer.js';
 import { useNavigate } from 'react-router-dom';
 
 
@@ -23,7 +26,7 @@ function Login() {
                 // Redirigir al usuario a la página principal o a donde lo necesites
                 alert('Inicio de sesión exitoso');
 
-                navigate ('/dashboard');
+                navigate ('/');
             } else {
                 setError('Correo o contraseña incorrectos');
                 
@@ -48,10 +51,15 @@ function Login() {
 
     return (
         <>
+
             <div className="login-container">
                 <div className="logo">
-                    <span className="logo-icon">&lt;&gt;</span>
-                    LOOKODE
+                <img className="logoimg"
+            src="img_simbolos/logo_lookode.png" 
+            alt="Avatar" 
+            width="40" 
+            height="25" 
+          />
                 </div>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
@@ -77,8 +85,9 @@ function Login() {
                     <button type="submit" className="btn-enter">ENTRAR</button>
                     {error && <p className="error-message">{error}</p>}
                 </form>
-                <a href="#" className="signup-link">Todavía no soy Lookoder</a>
+                <Link to="/registro" className="signup-link">Todavía no soy Lookoder</Link>
             </div>
+
         </>
     );
 }

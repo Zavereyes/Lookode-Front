@@ -39,13 +39,23 @@ const PerfilHeader = ({showViewsButton = true}) => {
             className={`perfil-button ${activeButton === 'button1' ? 'active' : ''}`} 
             onClick={() => handleButtonClick('button1')}
           >
-            &lt;&gt;
+            <img 
+            src="img_simbolos/crear_simbolo.png" 
+            alt="Avatar" 
+            width="15" 
+            height="9" 
+          />
           </button>}
           {showViewsButton &&<button 
             className={`perfil-button ${activeButton === 'button2' ? 'active' : ''}`} 
             onClick={() => handleButtonClick('button2')}
           >
-            &lt;3
+            <img 
+            src="img_simbolos/estrella.png" 
+            alt="Avatar" 
+            width="15" 
+            height="15" 
+          />
       </button>}
         </div>
         {/* Se muestra el texto debajo si hay uno seleccionado */}
