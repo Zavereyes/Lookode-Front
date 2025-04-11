@@ -4,6 +4,7 @@
     justify-content: center;
     align-items: center;
     padding: 20px;
+    margin-top: 60px; /* Añade este margen para dejar espacio al header */
 }
 
 .addcontentpryct-image-container {
@@ -193,3 +194,91 @@
     background-color: #6c5ce7;
     color: white;
 }
+/* Contenedor general para los elementos cargados */
+.addcontentpryct-content-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    
+}
+
+/* Estilo para cada elemento cargado */
+.addcontentpryct-content-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    position: relative;
+}
+.addcontentpryct-delete-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(255, 0, 0, 0.7); /* Fondo rojo transparente */
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    opacity: 0;
+}
+
+.addcontentpryct-content-item:hover .addcontentpryct-delete-btn {
+    opacity: 1; /* Mostrar el icono al pasar el cursor */
+}
+
+.addcontentpryct-delete-btn:hover {
+    background-color: rgba(255, 0, 0, 1); /* Fondo más opaco cuando se pasa el cursor */
+}
+/* Contenedor de imagen */
+.addcontentpryct-image-container {
+    max-width: 100%;
+    width: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.addcontentpryct-main-image {
+    max-width: 100%;
+    object-fit: contain;
+}
+
+/* Contenedor de texto */
+.addcontentpryct-text-container {
+    width: 100%;
+    max-height: 200px; /* Limitar la altura para aplicar el scroll */
+    overflow-y: auto;  /* Agregar scroll si el contenido es largo */
+    background-color: #f5f5f7;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.addcontentpryct-text-container pre {
+    white-space: pre-wrap; /* Mantener los saltos de línea */
+    word-wrap: break-word; /* Asegurarse de que las palabras largas se rompan */
+    margin: 0;
+}
+
+/* Otros estilos (ya definidos en tu código CSS) */
+.addcontentpryct-navbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #f5f5f7;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+}
+

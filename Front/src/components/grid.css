@@ -4,6 +4,8 @@
   max-width: 100vw; /* Usa todo el ancho disponible */
   width: 100%;
   padding: 20px;
+  margin-top: 90px;
+  
 }
 
 @media (max-width: 1200px) {
@@ -50,7 +52,7 @@
 .edit-button {
   width: 30px;
   height: 30px;
-  background-color: #b369b2;
+  background-color: transparent;
   border: none;
   border-radius: 50%;
   position: absolute;

@@ -2,64 +2,92 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import './login.css';
-import Header from '../components/header.js';
-import Footer from '../components/footer.js';
 import { useNavigate } from 'react-router-dom';
-
 
 function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const navigate = useNavigate(); 
-
+    const [showModal, setShowModal] = useState(false);
+    const [idUsuario, setIdUsuario] = useState(null);
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
-        e.preventDefault(); 
+        e.preventDefault();
+        setError('');
+        
         try {
             const response = await axios.post('http://localhost:3001/login', {
                 correo: email,
                 contraseña: password
             });
-
+            
             if (response.data.message === 'Login exitoso') {
-                // Redirigir al usuario a la página principal o a donde lo necesites
+                localStorage.setItem('token', response.data.token);
+                localStorage.setItem('usuario', JSON.stringify(response.data.usuario));
+                
                 alert('Inicio de sesión exitoso');
-
-                navigate ('/');
+                navigate('/');
+            } else if (response.data.message === 'Usuario desactivado') {
+                // Mostrar modal de reactivación
+                setIdUsuario(response.data.idUsuario);
+                setShowModal(true);
             } else {
                 setError('Correo o contraseña incorrectos');
-                
             }
         } catch (error) {
-            console.error('Error al iniciar sesión', error);
-            if (error.response) {
-                // La respuesta del servidor con el error
-                console.error('Respuesta del servidor:', error.response.data);
-                console.error('Estado del error:', error.response.status);
-            } else if (error.request) {
-                // La solicitud fue realizada, pero no hubo respuesta
-                console.error('No se recibió respuesta del servidor:', error.request);
-            } else {
-                // Algo pasó al configurar la solicitud
-                console.error('Error al configurar la solicitud:', error.message);
-            }
+            console.error('Error de login:', error);
             setError('Hubo un error al iniciar sesión');
         }
+    };
+
+    const handleReactivarCuenta = async () => {
+        try {
+            const response = await axios.post('http://localhost:3001/reactivar-cuenta', {
+                idUsuario: idUsuario
+            });
+            
+            if (response.data.message === "Cuenta reactivada exitosamente") {
+                setShowModal(false);
+                alert('Cuenta reactivada exitosamente. Por favor, inicie sesión nuevamente.');
+                // Opcional: Limpiar los campos
+                setEmail('');
+                setPassword('');
+            }
+        } catch (error) {
+            console.error('Error al reactivar cuenta:', error);
+            setError('Error al reactivar cuenta');
+        }
+    };
+
+    const Modal = () => {
+        if (!showModal) return null;
         
+        return (
+            <div className="modal-overlay">
+                <div className="modal-container">
+                    <h2>Cuenta desactivada</h2>
+                    <p>Esta cuenta ha sido desactivada, ¿desea reactivarla?</p>
+                    <div className="modal-buttons">
+                        <button onClick={handleReactivarCuenta} className="btn-accept">Aceptar</button>
+                        <button onClick={() => setShowModal(false)} className="btn-cancel">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        );
     };
 
     return (
         <>
-
             <div className="login-container">
                 <div className="logo">
-                <img className="logoimg"
-            src="img_simbolos/logo_lookode.png" 
-            alt="Avatar" 
-            width="40" 
-            height="25" 
-          />
+                    <img 
+                        className="logoimg"
+                        src="img_simbolos/logo_lookode.png" 
+                        alt="Avatar" 
+                        width="40" 
+                        height="25" 
+                    />
                 </div>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
@@ -87,7 +115,7 @@ function Login() {
                 </form>
                 <Link to="/registro" className="signup-link">Todavía no soy Lookoder</Link>
             </div>
-
+            <Modal />
         </>
     );
 }

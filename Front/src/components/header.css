@@ -3,29 +3,27 @@
     padding: 0;
     box-sizing: border-box;
     
+    
 }
 
 body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    padding-top: 60px; /* Reserva espacio para el header */
-    margin: 0;
-    padding: 0;
+    padding-top: 60px; /* Mantén esto para reservar espacio para el header */
+    margin: 0;/* Este padding: 0 está anulando el padding-top: 60px anterior */
 }
 
 .header {
-
-    width: 100vw; 
+    position: fixed; /* Asegúrate de que esto esté definido */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    top: 0;
-    left: 0;
     padding: 1rem 2rem;
     background: linear-gradient(to right, #f3e7fe, #ffe7fe);
-    height: 70px;
-    z-index: 1000;  /* Se mantiene sobre otros elementos */
-    width: 100%;  /* Ocupa todo el ancho */
-    height: 60px;  /* Ajusta según lo necesites */
+    z-index: 1000;
 }
 
 .main-content {
@@ -105,4 +103,31 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+}
+.dropdown {
+    position:fixed;
+    top: 60px;
+    right: 0;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    width: 120px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+}
+
+.dropdown-btn {
+    background-color: #6366f1;
+    color: white;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-btn:hover {
+    background-color: #4f46e5;
 }

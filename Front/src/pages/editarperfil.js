@@ -1,19 +1,27 @@
-import React from 'react';
+import React, {useEffect} from 'react';
+import { useNavigate } from 'react-router-dom';
 import Formulariodatos from '../components/formulariodatos.js';
 import Header from '../components/header.js';
-import PerfilHeader from '../components/perfilheader.js';
+import authService from '../services/authService';
 
-function Registro() {
+function Editarperfil() {
+    const navigate = useNavigate();
+    
+    // Verificar si el usuario está autenticado
+    useEffect(() => {
+        if (!authService.isAuthenticated()) {
+            navigate('/login');
+        }
+    }, [navigate]);
     return (
         <>
             <Header />
             
-            <PerfilHeader showViewsButton = {false} />
 
             <div className="background-pattern"></div>
                 <div className="container">
                   
-                    <Formulariodatos  showRegistrarButton ={false}  showLookodeLogo = {false} showLinkLookoder= {false} />
+                    <Formulariodatos modo="editar" showRegistrarButton ={false}  showLookodeLogo = {false} showLinkLookoder= {false} />
 
                 </div>
 
@@ -21,4 +29,4 @@ function Registro() {
     );
 }
 
-export default Registro;
+export default Editarperfil;

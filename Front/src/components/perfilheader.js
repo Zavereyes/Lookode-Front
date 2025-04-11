@@ -1,11 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './perfilheader.css';
 import { Link } from 'react-router-dom';
+import authService from '../services/authService';
 
 const PerfilHeader = ({showViewsButton = true}) => {
   // Estado para manejar el botón activo
   const [activeButton, setActiveButton] = useState(null);
+  const [avatarUrl, setAvatarUrl] = useState(null);
   const [displayText, setDisplayText] = useState(''); // Estado para mostrar el texto
+  const usuario = authService.getCurrentUser();
+  
+  useEffect(() => {
+      // Cargar el avatar cuando el componente se monta
+      const fetchAvatar = async () => {
+        if (usuario && usuario.idUsuario) {
+          try {
+            const url = await authService.getAvatar(usuario.idUsuario);
+            if (url) {
+              setAvatarUrl(url);
+            }
+          } catch (error) {
+            console.error("Error al cargar el avatar:", error);
+          }
+        }
+      };
+  
+      fetchAvatar();
+  
+      // Limpieza del URL.createObjectURL al desmontar
+      return () => {
+        if (avatarUrl) {
+          URL.revokeObjectURL(avatarUrl);
+        }
+      };
+    }, [usuario]);
 
   const handleButtonClick = (buttonId) => {
     setActiveButton(buttonId);
@@ -23,16 +51,15 @@ const PerfilHeader = ({showViewsButton = true}) => {
       <div className="profile-container">
         <Link to = "/editarperfil" > <div className="logo">
           <img 
-            src="/zave.jpg" 
+            src= {avatarUrl}
             alt="Avatar" 
             width="40" 
             height="40" 
-            style={{ borderRadius: '50%' }} 
-          /> 
+            /> 
         </div>
         </Link>
 
-        <div className="username">ZAVEREYES</div>
+        <div className="username"> {usuario ? usuario.nickname : 'Invitado'}</div>
         
         <div className="buttons-container">
         {showViewsButton && <button 

@@ -119,3 +119,65 @@ body::before {
 .signup-link:hover {
     text-decoration: underline;
 }
+/* Agregar estos estilos a tu archivo login.css */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-container {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.modal-container h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #5849e6;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.btn-accept, .btn-cancel {
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-accept {
+    background-color: #4a90e2;
+    color: white;
+}
+
+.btn-cancel {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
+.btn-accept:hover {
+    background-color: #357bd8;
+}
+
+.btn-cancel:hover {
+    background-color: #d0d0d0;
+}
