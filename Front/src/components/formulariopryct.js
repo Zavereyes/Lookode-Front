@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './formulariopryct.css';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { projectService } from '../services/projectService';
 import Select from 'react-select';
 
@@ -11,8 +11,11 @@ const Formularioprcyt = ({ showContinuarButton = true, showEditarButton = true, 
     const [tags, setTags] = useState([]);
     const [availableTags, setAvailableTags] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    
+  const { idProyecto } = useParams(); // Obtener idProyecto de la URL
 
     useEffect(() => {
         const fetchTags = async () => {
@@ -103,6 +106,32 @@ const Formularioprcyt = ({ showContinuarButton = true, showEditarButton = true, 
         }
     };
 
+    const handleDeleteProject = async () => {
+        if (!idProyecto) {
+            setError('No se pudo identificar el proyecto a eliminar');
+            return;
+        }
+
+        const confirmar = window.confirm('¿Estás seguro de que deseas eliminar este proyecto? Esta acción no se puede deshacer.');
+        
+        if (!confirmar) {
+            return;
+        }
+
+        setIsDeleting(true);
+        setError('');
+
+        try {
+            await projectService.deleteProject(idProyecto);
+            navigate('/perfil');
+        } catch (error) {
+            console.error('Error al eliminar proyecto:', error);
+            setError('Error al eliminar el proyecto. Inténtalo de nuevo.');
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
     return (
         <div className="main-content">
             <div className="container">
@@ -165,7 +194,14 @@ const Formularioprcyt = ({ showContinuarButton = true, showEditarButton = true, 
                             )}
 
                             {showEliminarButton && (
-                                <button type="button" className="btn btn-eliminar">Eliminar</button>
+                                <button 
+                                    type="button" 
+                                    className="btn btn-eliminar"
+                                    onClick={handleDeleteProject}
+                                    disabled={isDeleting}
+                                >
+                                    {isDeleting ? 'Eliminando...' : 'Eliminar'}
+                                </button>
                             )}
 
                             {showEditarButton && (

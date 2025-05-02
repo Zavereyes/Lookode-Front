@@ -1,0 +1,9 @@
+.search-results-header {
+    margin-top: 100px;
+    top: 120px; /* ajusta según la altura de tu header */
+    left: 0;
+    width: 100%;
+    padding: 1rem;
+    z-index: 1000; /* para que esté sobre otros elementos */
+  }
+  

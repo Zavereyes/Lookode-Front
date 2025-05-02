@@ -46,9 +46,21 @@ const getAllTags = async () => {
   }
 };
 
+// Eliminar un proyecto
+const deleteProject = async (projectId) => {
+  try {
+    const response = await axios.delete(`${API_URL}/proyectos/${projectId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error al eliminar proyecto:', error);
+    throw error;
+  }
+};
+
 export const projectService = {
   createProject,
-  getAllTags
+  getAllTags,
+  deleteProject
 };
 
 export default projectService;

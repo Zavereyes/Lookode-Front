@@ -1,18 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../components/header.js';
 import './addcontentpryct.css'; 
-import { Link, useParams, useNavigate, Navigate } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
+import { IoIosImage } from "react-icons/io";
+import { RiTextSnippet } from "react-icons/ri";
+import { PiVideoFill } from "react-icons/pi";
 function AddContentPryct() {
     const { idProyecto } = useParams();
     const [content, setContent] = useState([]); 
     const navigate = useNavigate();
+    const token = localStorage.getItem('token'); // Obtener el token de autenticación
+    
+    // Verificar si el usuario está autenticado
+    useEffect(() => {
+        if (!token) {
+            navigate('/login');
+        }
+    }, [token, navigate]);
+    
     const handleFileUpload = (type) => {
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
-        fileInput.accept = type === 'image' ? 'image/*' : '.txt';
-
+        if (type === 'image') {
+            fileInput.accept = 'image/*';
+        } else if (type === 'txt') {
+            fileInput.accept = '.txt';
+        } else if (type === 'video') {
+            fileInput.accept = 'video/*'; // Aceptar cualquier formato de video
+        }
+        
         fileInput.onchange = (e) => {
             const file = e.target.files[0];
 
@@ -31,10 +48,19 @@ function AddContentPryct() {
                     reader.onload = () => {
                         setContent(prevContent => [
                             ...prevContent,
-                            { type: 'documento', file: file, content: reader.result }
+                            { type: 'txt', file: file, content: reader.result }
                         ]);
                     };
                     reader.readAsText(file);
+                } else if (type === 'video') {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        setContent(prevContent => [
+                            ...prevContent,
+                            { type: 'video', file: file, preview: reader.result }
+                        ]);
+                    };
+                    reader.readAsDataURL(file);
                 }
             }
         };
@@ -50,6 +76,12 @@ function AddContentPryct() {
     // Function to publish content
     const handlePublish = async () => {
         try {
+            if (!token) {
+                alert('No has iniciado sesión');
+                navigate('/login');
+                return;
+            }
+            
             // Create a FormData object to send files
             const formData = new FormData();
             formData.append('idProyecto', idProyecto);
@@ -60,22 +92,28 @@ function AddContentPryct() {
                 formData.append(`contenido`, item.file);
             });
 
-            // Send to backend
+            // Send to backend with authorization header
             const response = await axios.post('http://localhost:3001/proyectos/contenido', formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${token}` // Añadir el token de autorización
                 }
             });
 
             // Handle successful upload
             alert('Proyecto Publicado Exitosamente');
             
-            navigate('/perfil')
+            navigate('/perfil');
             // Optionally, clear content or redirect
             setContent([]);
         } catch (error) {
             console.error('Error al publicar contenido:', error);
-            alert('Error al publicar contenido');
+            if (error.response && error.response.status === 401) {
+                alert('Sesión expirada. Por favor, inicia sesión nuevamente.');
+                navigate('/login');
+            } else {
+                alert('Error al publicar contenido');
+            }
         }
     };
 
@@ -102,10 +140,10 @@ function AddContentPryct() {
                                         className="addcontentpryct-delete-btn" 
                                         onClick={() => handleDelete(index)}
                                     >
-                                        &#10005;
+                                       
                                     </button>
                                 </div>
-                            ) : (
+                            ) : item.type === 'txt' ? (
                                 <div className="addcontentpryct-text-container">
                                     <pre>{item.content}</pre>
                                     <button 
@@ -115,7 +153,21 @@ function AddContentPryct() {
                                         &#10005;
                                     </button>
                                 </div>
-                            )}
+                            ) : item.type === 'video' ? (
+                                <div className="addcontentpryct-video-container">
+                                    <video 
+                                        src={item.preview} 
+                                        controls 
+                                        className="addcontentpryct-main-video"
+                                    />
+                                    <button 
+                                        className="addcontentpryct-delete-btn" 
+                                        onClick={() => handleDelete(index)}
+                                    >
+                                        &#10005;
+                                    </button>
+                                </div>
+                            ) : null}
                         </div>
                     ))}
                 </div>
@@ -131,13 +183,19 @@ function AddContentPryct() {
                         className="addcontentpryct-btn addcontentpryct-btn-icon"
                         onClick={() => handleFileUpload('image')}
                     >
-                        ^
+                        <IoIosImage />;
                     </button>
                     <button 
                         className="addcontentpryct-btn addcontentpryct-btn-icon"
                         onClick={() => handleFileUpload('txt')}
                     >
-                        T
+                        <RiTextSnippet />
+                    </button>
+                    <button 
+                        className="addcontentpryct-btn addcontentpryct-btn-icon"
+                        onClick={() => handleFileUpload('video')}
+                    >
+                       <PiVideoFill />
                     </button>
                 </div>
 

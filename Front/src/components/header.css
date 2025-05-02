@@ -2,18 +2,16 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    
-    
 }
 
 body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    padding-top: 60px; /* Mantén esto para reservar espacio para el header */
-    margin: 0;/* Este padding: 0 está anulando el padding-top: 60px anterior */
+    padding-top: 60px;
+    margin: 0;
 }
 
 .header {
-    position: fixed; /* Asegúrate de que esto esté definido */
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
@@ -24,12 +22,14 @@ body {
     padding: 1rem 2rem;
     background: linear-gradient(to right, #f3e7fe, #ffe7fe);
     z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .main-content {
-    margin-top: 80px; /* Ajusta el margen superior según la altura del header */
+    margin-top: 80px;
     padding: 1rem;
 }
+
 .logo {
     color: #6366f1;
     font-size: 24px;
@@ -94,6 +94,11 @@ body {
     cursor: pointer;
 }
 
+/* Avatar y contenedor */
+.avatar-container {
+    position: relative;
+}
+
 .avatar {
     width: 40px;
     height: 40px;
@@ -103,31 +108,166 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-}
-.dropdown {
-    position:fixed;
-    top: 60px;
-    right: 0;
-    background-color: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    width: 120px;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
+    position: relative;
+    transition: transform 0.2s ease;
+    border: 2px solid transparent;
 }
 
-.dropdown-btn {
-    background-color: #6366f1;
-    color: white;
-    border: none;
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
+.avatar:hover {
+    transform: scale(1.05);
+    border-color: #6366f1;
+}
+
+.avatar-status {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+.avatar-status.online {
+    background-color: #10b981;
+}
+
+/* Nuevo dropdown estilizado */
+.user-dropdown {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    width: 280px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    overflow: hidden;
+    z-index: 1001;
+    animation: slideDown 0.2s ease-out forwards;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.user-info {
+    display: flex;
+    padding: 16px;
+    background: linear-gradient(to right, #f0e7ff, #e7f5ff);
+    align-items: center;
+}
+
+.user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 12px;
+    border: 2px solid white;
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-details {
+    flex: 1;
+}
+
+.user-name {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 2px;
+}
+
+.user-email {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background-color: #eee;
+    margin: 4px 0;
+}
+
+.dropdown-menu {
+    padding: 8px 0;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.dropdown-item:hover {
+    background-color: #f5f5f5;
+}
+
+.dropdown-icon {
+    margin-right: 12px;
+    font-size: 1.1rem;
+    width: 24px;
     text-align: center;
+}
+
+.logout-item {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1rem;
+    margin-top: 4px;
+    color: #e11d48;
+}
+
+.logout-item:hover {
+    background-color: #fff1f2;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    max-width: 600px;
+    margin: 0 2rem;
+}
+.icono-busqueda {
+    color: #6366f1;
+    font-size: 24px;
+  }
+  .icono-busqueda:hover {
+    color: #4f46e5;
+    transform: scale(1.1);
+    text-shadow: 0 2px 6px rgba(99, 102, 241, 0.3);
+
+  }
+.search-button {
+    margin-left: 0.5rem;
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 1rem;
+    background: linear-gradient(to right, #f3e7fe, #ffe7fe);    color: white;
+    font-size: 1rem;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
-.dropdown-btn:hover {
+.search-button:hover {
     background-color: #4f46e5;
 }

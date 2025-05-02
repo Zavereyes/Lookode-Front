@@ -60,3 +60,15 @@
   right: 10px;
   cursor: pointer;
 }
+
+.icon-editar{
+  color: #6366f1;
+  font-size: 24px;
+}
+
+.icon-editar:hover{
+  color: #4f46e5;
+    transform: scale(1.1);
+    text-shadow: 0 2px 6px rgba(99, 102, 241, 0.3);
+
+}

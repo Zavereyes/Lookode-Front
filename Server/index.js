@@ -145,25 +145,26 @@ app.post('/reactivar-cuenta', (req, res) => {
 
 
 // obtener avatar
-app.get('/usuario/avatar/:id', verificarToken, (req, res) => {
-    const idUsuario = req.params.id;
-    
-    const query = 'SELECT avatar FROM Usuarios WHERE idUsuario = ?';
-    db.query(query, [idUsuario], (error, results) => {
-        if (error) {
-            console.error('Error al obtener avatar:', error);
-            return res.status(500).json({ message: "Error al obtener avatar" });
-        }
-        
-        if (results.length > 0 && results[0].avatar) {
-            // Configurar headers para imagen
-            res.setHeader('Content-Type', 'image/jpeg');
-            // Enviar el blob directamente
-            res.send(results[0].avatar);
-        } else {
-            res.status(404).json({ message: "Avatar no encontrado" });
-        }
-    });
+// Cambiar este endpoint para no requerir autenticación
+app.get('/usuario/avatar/:id', (req, res) => {
+  const idUsuario = req.params.id;
+  
+  const query = 'SELECT avatar FROM Usuarios WHERE idUsuario = ?';
+  db.query(query, [idUsuario], (error, results) => {
+      if (error) {
+          console.error('Error al obtener avatar:', error);
+          return res.status(500).json({ message: "Error al obtener avatar" });
+      }
+      
+      if (results.length > 0 && results[0].avatar) {
+          // Configurar headers para imagen
+          res.setHeader('Content-Type', 'image/jpeg');
+          // Enviar el blob directamente
+          res.send(results[0].avatar);
+      } else {
+          res.status(404).json({ message: "Avatar no encontrado" });
+      }
+  });
 });
 
 app.put('/usuario/desactivar/:id', verificarToken, (req, res) => {
@@ -590,6 +591,488 @@ app.get('/proyectos/:idProyecto/primera-imagen', verificarToken, (req, res) => {
     res.send(results[0].contenido);
   });
 });
+
+
+
+// Endpoint para obtener todos los detalles de un proyecto específico
+app.get('/proyectos/:idProyecto/detalles', verificarToken, (req, res) => {
+  const idProyecto = req.params.idProyecto;
+  
+  // Comenzamos una transacción para asegurar la consistencia de los datos
+  db.beginTransaction((err) => {
+    if (err) {
+      console.error('Error al iniciar transacción:', err);
+      return res.status(500).json({ message: "Error al obtener detalles del proyecto" });
+    }
+    
+    // 1. Obtener información del proyecto y del usuario creador
+    const queryProyecto = `
+      SELECT p.idProyecto, p.Titulo, 
+             u.idUsuario, u.avatar, u.nickname, u.twitter, u.ig
+      FROM Proyectos p
+      JOIN Usuarios u ON p.idUsuario = u.idUsuario
+      WHERE p.idProyecto = ?
+    `;
+    
+    db.query(queryProyecto, [idProyecto], (error, proyectoResults) => {
+      if (error) {
+        return db.rollback(() => {
+          console.error('Error al obtener proyecto:', error);
+          res.status(500).json({ message: "Error al obtener detalles del proyecto" });
+        });
+      }
+      
+      if (proyectoResults.length === 0) {
+        return db.rollback(() => {
+          res.status(404).json({ message: "Proyecto no encontrado" });
+        });
+      }
+      
+      const proyectoInfo = proyectoResults[0];
+      const idUsuario = proyectoInfo.idUsuario;
+      
+      // 2. Obtener los IDs de contenido
+      const queryContenidos = `
+        SELECT idContenido, tipo
+        FROM Contenidos
+        WHERE idProyecto = ?
+        ORDER BY idContenido ASC
+      `;
+      
+      db.query(queryContenidos, [idProyecto], (error, contenidosResults) => {
+        if (error) {
+          return db.rollback(() => {
+            console.error('Error al obtener contenidos:', error);
+            res.status(500).json({ message: "Error al obtener contenidos del proyecto" });
+          });
+        }
+        
+        // 3. Obtener los tags del proyecto
+        const queryTags = `
+          SELECT t.idTag, t.NombreTag
+          FROM Tags t
+          JOIN TagEnProyecto tp ON t.idTag = tp.idTag
+          WHERE tp.idProyecto = ?
+        `;
+        
+        db.query(queryTags, [idProyecto], (error, tagsResults) => {
+          if (error) {
+            return db.rollback(() => {
+              console.error('Error al obtener tags:', error);
+              res.status(500).json({ message: "Error al obtener tags del proyecto" });
+            });
+          }
+          
+          // Confirmar la transacción
+          db.commit((err) => {
+            if (err) {
+              return db.rollback(() => {
+                console.error('Error al confirmar transacción:', err);
+                res.status(500).json({ message: "Error al obtener detalles del proyecto" });
+              });
+            }
+            
+            // Crear objeto con toda la información
+            const response = {
+              proyecto: {
+                idProyecto: proyectoInfo.idProyecto,
+                titulo: proyectoInfo.Titulo
+              },
+              usuario: {
+                idUsuario: proyectoInfo.idUsuario,
+                
+                nickname: proyectoInfo.nickname,
+                twitter: proyectoInfo.twitter,
+                ig: proyectoInfo.ig
+              },
+              contenidos: contenidosResults.map(item => ({
+                idContenido: item.idContenido,
+                tipo: item.tipo,
+                url: `/contenidos/${item.idContenido}`
+              })),
+              tags: tagsResults
+            };
+            
+            res.json(response);
+          });
+        });
+      });
+    });
+  });
+});
+
+// Endpoint para obtener un contenido específico por su ID
+app.get('/contenidos/:idContenido', (req, res) => {
+  const idContenido = req.params.idContenido;
+  
+  const query = 'SELECT tipo, contenido FROM Contenidos WHERE idContenido = ?';
+  
+  db.query(query, [idContenido], (error, results) => {
+    if (error) {
+      console.error('Error al obtener contenido:', error);
+      return res.status(500).json({ message: "Error al obtener contenido" });
+    }
+    
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Contenido no encontrado" });
+    }
+    
+    const contenido = results[0];
+    
+    // Configurar el tipo de contenido adecuado para la respuesta
+    switch (contenido.tipo) {
+      case 'imagen':
+        res.contentType('image/jpeg');
+        break;
+      case 'video':
+        res.contentType('video/mp4');
+        break;
+      case 'documento':
+        res.contentType('application/pdf');
+        break;
+      case 'txt':
+        res.contentType('text/plain');
+        break;
+      default:
+        res.contentType('application/octet-stream');
+    }
+    
+    // Enviar el contenido
+    res.send(contenido.contenido);
+  });
+});
+/////////////////////favoritos///////////
+// Añadir estos endpoints en index.js
+
+// Verificar si un proyecto está en favoritos
+app.get('/favoritos/check/:idProyecto', verificarToken, (req, res) => {
+  const idProyecto = req.params.idProyecto;
+  const idUsuario = req.usuario.idUsuario;
+  
+  // Buscar el favorito del usuario
+  const queryBuscarFavorito = 'SELECT idFavorito FROM Favoritos WHERE idUsuario = ? LIMIT 1';
+  
+  db.query(queryBuscarFavorito, [idUsuario], (error, favoritos) => {
+    if (error) {
+      console.error('Error al buscar favoritos:', error);
+      return res.status(500).json({ message: "Error al verificar favoritos" });
+    }
+    
+    // Si el usuario no tiene una lista de favoritos
+    if (favoritos.length === 0) {
+      return res.json({ enFavoritos: false });
+    }
+    
+    const idFavorito = favoritos[0].idFavorito;
+    
+    // Verificar si el proyecto está en favoritos
+    const queryCheckProyecto = 'SELECT COUNT(*) as count FROM ProyectoEnFavorito WHERE idFavorito = ? AND idProyecto = ?';
+    
+    db.query(queryCheckProyecto, [idFavorito, idProyecto], (error, results) => {
+      if (error) {
+        console.error('Error al verificar proyecto en favoritos:', error);
+        return res.status(500).json({ message: "Error al verificar favoritos" });
+      }
+      
+      const enFavoritos = results[0].count > 0;
+      res.json({ enFavoritos });
+    });
+  });
+});
+
+// Añadir un proyecto a favoritos
+app.post('/favoritos/add', verificarToken, (req, res) => {
+  const { idProyecto } = req.body;
+  const idUsuario = req.usuario.idUsuario;
+  
+  // Comenzar transacción
+  db.beginTransaction(async (err) => {
+    if (err) {
+      console.error('Error al iniciar transacción:', err);
+      return res.status(500).json({ message: "Error al guardar favorito" });
+    }
+    
+    try {
+      // Verificar si el usuario ya tiene una lista de favoritos
+      const queryCheckFavoritos = 'SELECT idFavorito FROM Favoritos WHERE idUsuario = ? LIMIT 1';
+      
+      db.query(queryCheckFavoritos, [idUsuario], (error, favoritos) => {
+        if (error) {
+          return db.rollback(() => {
+            console.error('Error al verificar favoritos:', error);
+            res.status(500).json({ message: "Error al guardar favorito" });
+          });
+        }
+        
+        let idFavorito;
+        
+        // Si no tiene lista de favoritos, crear una
+        if (favoritos.length === 0) {
+          const queryCrearFavorito = 'INSERT INTO Favoritos (idUsuario) VALUES (?)';
+          
+          db.query(queryCrearFavorito, [idUsuario], (error, result) => {
+            if (error) {
+              return db.rollback(() => {
+                console.error('Error al crear lista de favoritos:', error);
+                res.status(500).json({ message: "Error al crear lista de favoritos" });
+              });
+            }
+            
+            idFavorito = result.insertId;
+            insertarProyectoEnFavorito(idFavorito);
+          });
+        } else {
+          // Si ya tiene lista de favoritos, usar el ID existente
+          idFavorito = favoritos[0].idFavorito;
+          insertarProyectoEnFavorito(idFavorito);
+        }
+        
+        // Función para insertar el proyecto en la lista de favoritos
+        function insertarProyectoEnFavorito(idFavorito) {
+          const queryInsertProyecto = 'INSERT INTO ProyectoEnFavorito (idFavorito, idProyecto) VALUES (?, ?)';
+          
+          db.query(queryInsertProyecto, [idFavorito, idProyecto], (error) => {
+            if (error) {
+              return db.rollback(() => {
+                console.error('Error al insertar proyecto en favoritos:', error);
+                res.status(500).json({ message: "Error al guardar en favoritos" });
+              });
+            }
+            
+            // Confirmar transacción
+            db.commit((err) => {
+              if (err) {
+                return db.rollback(() => {
+                  console.error('Error al confirmar transacción:', err);
+                  res.status(500).json({ message: "Error al guardar favorito" });
+                });
+              }
+              
+              res.json({ message: "Proyecto guardado en favoritos" });
+            });
+          });
+        }
+      });
+    } catch (error) {
+      db.rollback(() => {
+        console.error('Error en la transacción:', error);
+        res.status(500).json({ message: "Error al guardar favorito" });
+      });
+    }
+  });
+});
+
+// Eliminar un proyecto de favoritos
+app.delete('/favoritos/remove/:idProyecto', verificarToken, (req, res) => {
+  const idProyecto = req.params.idProyecto;
+  const idUsuario = req.usuario.idUsuario;
+  
+  // Buscar el idFavorito del usuario
+  const queryBuscarFavorito = 'SELECT idFavorito FROM Favoritos WHERE idUsuario = ? LIMIT 1';
+  
+  db.query(queryBuscarFavorito, [idUsuario], (error, favoritos) => {
+    if (error) {
+      console.error('Error al buscar favoritos:', error);
+      return res.status(500).json({ message: "Error al eliminar de favoritos" });
+    }
+    
+    if (favoritos.length === 0) {
+      return res.status(404).json({ message: "No tienes lista de favoritos" });
+    }
+    
+    const idFavorito = favoritos[0].idFavorito;
+    
+    // Eliminar la relación en ProyectoEnFavorito
+    const queryEliminar = 'DELETE FROM ProyectoEnFavorito WHERE idFavorito = ? AND idProyecto = ?';
+    
+    db.query(queryEliminar, [idFavorito, idProyecto], (error, result) => {
+      if (error) {
+        console.error('Error al eliminar de favoritos:', error);
+        return res.status(500).json({ message: "Error al eliminar de favoritos" });
+      }
+      
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: "Proyecto no encontrado en favoritos" });
+      }
+      
+      res.json({ message: "Proyecto eliminado de favoritos" });
+    });
+  });
+});
+
+
+// Obtener proyectos favoritos del usuario
+app.get('/favoritos/proyectos', verificarToken, (req, res) => {
+  const idUsuario = req.usuario.idUsuario;
+  
+  const query = `
+    SELECT p.idProyecto, p.Titulo 
+    FROM Proyectos p
+    JOIN ProyectoEnFavorito pf ON p.idProyecto = pf.idProyecto
+    JOIN Favoritos f ON pf.idFavorito = f.idFavorito
+    JOIN Usuarios u ON p.idUsuario = u.idUsuario
+    WHERE f.idUsuario = ? AND u.activo = 1
+  `;
+  
+  db.query(query, [idUsuario], (error, results) => {
+    if (error) {
+      console.error('Error al obtener proyectos favoritos:', error);
+      return res.status(500).json({ message: "Error al obtener proyectos favoritos" });
+    }
+    
+    res.json(results);
+  });
+});
+
+
+// Obtener proyectos creados por el usuario actual
+app.get('/proyectos/usuario', verificarToken, (req, res) => {
+  const idUsuario = req.usuario.idUsuario;
+  
+  const query = `
+    SELECT p.idProyecto, p.Titulo 
+    FROM Proyectos p
+    WHERE p.idUsuario = ?
+  `;
+  
+  db.query(query, [idUsuario], (error, results) => {
+    if (error) {
+      console.error('Error al obtener proyectos del usuario:', error);
+      return res.status(500).json({ message: "Error al obtener proyectos del usuario" });
+    }
+    
+    res.json(results);
+  });
+});
+
+// Endpoint para buscar proyectos por título, tags o usuario
+app.get('/proyectos/buscar', verificarToken, (req, res) => {
+  const searchTerm = req.query.q;
+  
+  if (!searchTerm || searchTerm.trim() === '') {
+    return res.json([]);
+  }
+  
+  // Dividir la búsqueda en palabras individuales para búsqueda más flexible
+  const searchTerms = searchTerm.split(' ').filter(term => term.trim() !== '');
+  
+  // Construir condiciones de búsqueda dinámicamente para cada término
+  const conditions = searchTerms.map(() => 
+    `(p.Titulo LIKE ? OR t.NombreTag LIKE ? OR u.nickname LIKE ?)`
+  ).join(' AND ');
+  
+  // Preparar parámetros para la consulta (cada término se usa 3 veces: título, tag, nickname)
+  const params = [];
+  searchTerms.forEach(term => {
+    params.push(`%${term}%`, `%${term}%`, `%${term}%`);
+  });
+  
+  const query = `
+    SELECT DISTINCT p.idProyecto, p.Titulo 
+    FROM Proyectos p
+    LEFT JOIN TagEnProyecto tp ON p.idProyecto = tp.idProyecto
+    LEFT JOIN Tags t ON tp.idTag = t.idTag
+    JOIN Usuarios u ON p.idUsuario = u.idUsuario
+    WHERE ${conditions} AND u.activo = 1
+  `;
+  
+  db.query(query, params, (error, results) => {
+    if (error) {
+      console.error('Error al buscar proyectos:', error);
+      return res.status(500).json({ message: "Error al buscar proyectos" });
+    }
+    
+    res.json(results);
+  });
+});
+
+//////// ELIMINAR PROYECTO////////////
+app.delete('/proyectos/:idProyecto', verificarToken, (req, res) => {
+  const idProyecto = req.params.idProyecto;
+  const idUsuario = req.usuario.idUsuario;
+  
+  
+  const queryVerificarPropietario = 'SELECT idProyecto FROM Proyectos WHERE idProyecto = ? AND idUsuario = ?';
+  
+  db.query(queryVerificarPropietario, [idProyecto, idUsuario], (error, results) => {
+    if (error) {
+      console.error('Error al verificar propiedad del proyecto:', error);
+      return res.status(500).json({ message: "Error al eliminar proyecto" });
+    }
+    
+    if (results.length === 0) {
+      return res.status(403).json({ message: "No tienes permiso para eliminar este proyecto" });
+    }
+    
+    db.beginTransaction((err) => {
+      if (err) {
+        console.error('Error al iniciar transacción:', err);
+        return res.status(500).json({ message: "Error al eliminar proyecto" });
+      }
+      
+      // 1. Eliminar registros en ProyectoEnFavorito
+      const queryEliminarFavoritos = 'DELETE FROM ProyectoEnFavorito WHERE idProyecto = ?';
+      
+      db.query(queryEliminarFavoritos, [idProyecto], (error) => {
+        if (error) {
+          return db.rollback(() => {
+            console.error('Error al eliminar favoritos:', error);
+            res.status(500).json({ message: "Error al eliminar proyecto" });
+          });
+        }
+        
+        // 2. Eliminar registros en TagEnProyecto
+        const queryEliminarTags = 'DELETE FROM TagEnProyecto WHERE idProyecto = ?';
+        
+        db.query(queryEliminarTags, [idProyecto], (error) => {
+          if (error) {
+            return db.rollback(() => {
+              console.error('Error al eliminar tags del proyecto:', error);
+              res.status(500).json({ message: "Error al eliminar proyecto" });
+            });
+          }
+          
+          // 3. Eliminar registros en Contenidos
+          const queryEliminarContenidos = 'DELETE FROM Contenidos WHERE idProyecto = ?';
+          
+          db.query(queryEliminarContenidos, [idProyecto], (error) => {
+            if (error) {
+              return db.rollback(() => {
+                console.error('Error al eliminar contenidos:', error);
+                res.status(500).json({ message: "Error al eliminar proyecto" });
+              });
+            }
+            
+            // 4. Finalmente, eliminar el proyecto
+            const queryEliminarProyecto = 'DELETE FROM Proyectos WHERE idProyecto = ?';
+            
+            db.query(queryEliminarProyecto, [idProyecto], (error) => {
+              if (error) {
+                return db.rollback(() => {
+                  console.error('Error al eliminar proyecto:', error);
+                  res.status(500).json({ message: "Error al eliminar proyecto" });
+                });
+              }
+              
+              // Confirmar la transacción
+              db.commit((err) => {
+                if (err) {
+                  return db.rollback(() => {
+                    console.error('Error al confirmar transacción:', err);
+                    res.status(500).json({ message: "Error al eliminar proyecto" });
+                  });
+                }
+                
+                res.json({ message: "Proyecto eliminado correctamente" });
+              });
+            });
+          });
+        });
+      });
+    });
+  });
+});
+
 
 // Añade esto a tu index.js
 app.get('/test', (req, res) => {

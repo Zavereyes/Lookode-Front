@@ -3,7 +3,7 @@ import './perfilheader.css';
 import { Link } from 'react-router-dom';
 import authService from '../services/authService';
 
-const PerfilHeader = ({showViewsButton = true}) => {
+const PerfilHeader = ({ showViewsButton = true, onViewModeChange }) => {
   // Estado para manejar el botón activo
   const [activeButton, setActiveButton] = useState(null);
   const [avatarUrl, setAvatarUrl] = useState(null);
@@ -38,11 +38,18 @@ const PerfilHeader = ({showViewsButton = true}) => {
   const handleButtonClick = (buttonId) => {
     setActiveButton(buttonId);
     
-  
     if (buttonId === 'button1') {
       setDisplayText('Creados');
+      // Notificar al componente padre sobre el cambio de modo de visualización
+      if (onViewModeChange) {
+        onViewModeChange('created');
+      }
     } else if (buttonId === 'button2') {
       setDisplayText('Favoritos');
+      // Notificar al componente padre sobre el cambio de modo de visualización
+      if (onViewModeChange) {
+        onViewModeChange('favorites');
+      }
     }
   };
 

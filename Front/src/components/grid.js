@@ -1,20 +1,44 @@
+// grid.js - modificación
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './grid.css';
-
-function Grid({ showEditButton = false }) {
+import { ImMagicWand } from "react-icons/im";
+function Grid({ showEditButton = false, viewMode = 'all', searchQuery = '' }) {
   const [projects, setProjects] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchProjects = async () => {
+      setIsLoading(true);
       try {
-        // First, fetch the projects
-        const projectsResponse = await axios.get('http://localhost:3001/proyectos', {
+        let url;
+        let config = {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
-        });
+        };
+
+        // Determinar la URL basada en el modo de visualización
+        if (viewMode === 'search' && searchQuery) {
+          // URL para búsqueda
+          url = `http://localhost:3001/proyectos/buscar?q=${encodeURIComponent(searchQuery)}`;
+        } else if (viewMode === 'favorites') {
+          url = 'http://localhost:3001/favoritos/proyectos';
+        } else if (viewMode === 'created') {
+          url = 'http://localhost:3001/proyectos/usuario';
+        } else {
+          url = 'http://localhost:3001/proyectos'; // Mostrar todos los proyectos (default)
+        }
+          
+        // Fetch the projects based on viewMode
+        const projectsResponse = await axios.get(url, config);
+
+        if (projectsResponse.data.length === 0) {
+          setProjects([]);
+          setIsLoading(false);
+          return;
+        }
 
         const projectsWithImages = await Promise.all(
           projectsResponse.data.map(async (project) => {
@@ -50,43 +74,55 @@ function Grid({ showEditButton = false }) {
         setProjects(projectsWithImages);
       } catch (error) {
         console.error('Error fetching projects:', error);
+        setProjects([]);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchProjects();
-  }, []);
+  }, [viewMode, searchQuery]); // Dependencies updated to include searchQuery
 
   return (
     <div className="grid-container">
-      {projects.map((project) => (
-        <Link 
-          key={project.idProyecto} 
-          to={`/viewproyecto/${project.idProyecto}`}
-        >
-          <div className="grid-item">
-            {project.imageSrc ? (
-              <img 
-                src={project.imageSrc} 
-                alt={`Proyecto ${project.Titulo}`} 
-              />
-            ) : (
-              <div className="placeholder-image">No Image</div>
-            )}
-            
-            {showEditButton && (
-              <Link to={`/editarpryct/${project.idProyecto}`}>
-                <button className="edit-button"> <img 
-            src="img_simbolos/crear_simbolo.png" 
-            alt="Avatar" 
-            width="5" 
-            height="5" 
-          />
-          </button>
-              </Link>
-            )}
-          </div>
-        </Link>
-      ))}
+      {isLoading ? (
+        <div className="loading-message">Cargando proyectos...</div>
+      ) : projects.length > 0 ? (
+        projects.map((project) => (
+          <Link 
+            key={project.idProyecto} 
+            to={`/viewproyecto/${project.idProyecto}`}
+          >
+            <div className="grid-item">
+              {project.imageSrc ? (
+                <img 
+                  src={project.imageSrc} 
+                  alt={`Proyecto ${project.Titulo}`} 
+                />
+              ) : (
+                <div className="placeholder-image">No Image</div>
+              )}
+              
+              
+              {/* Solo mostrar botón de editar si showEditButton=true y estamos en modo created */}
+              {showEditButton && viewMode === 'created' && (
+                <Link to={`/editarpryct/${project.idProyecto}`} onClick={(e) => e.stopPropagation()}>
+                  <button className="edit-button">
+                  <ImMagicWand className='icon-editar'/>
+                  </button>
+                </Link>
+              )}
+            </div>
+          </Link>
+        ))
+      ) : (
+        <div className="no-projects-message">
+          {viewMode === 'search' ? `No se encontraron resultados para "${searchQuery}"` :
+           viewMode === 'favorites' ? 'No tienes proyectos en favoritos' : 
+           viewMode === 'created' ? 'No has creado proyectos aún' : 
+           'No hay proyectos disponibles'}
+        </div>
+      )}
     </div>
   );
 }

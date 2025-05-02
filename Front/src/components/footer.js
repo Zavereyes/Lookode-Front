@@ -7,7 +7,7 @@ const Footer = () => {
         <div className="social-icons">
             <a href="#" className="social-icon">
               <img 
-                src="img_simbolos/X.png" 
+                src="/img_simbolos/X.png" 
                 alt="Avatar" 
                 width="15" 
                 height="15" 
@@ -15,7 +15,7 @@ const Footer = () => {
           </a>
             <a href="#" className="social-icon">
               <img 
-                src="img_simbolos/instagram.png" 
+                src="/img_simbolos/instagram.png" 
                 alt="Avatar" 
                 width="15" 
                 height="15" 
@@ -24,7 +24,7 @@ const Footer = () => {
         </div>
         <div className="logo">
           <img 
-            src="img_simbolos/logo_lookode.png" 
+            src="/img_simbolos/logo_lookode.png" 
             alt="Avatar" 
             width="150" 
             height="20" 
