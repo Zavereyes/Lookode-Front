@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 
 function Perfil() {
     // Estado para controlar el modo de visualización (all o favorites)
-    const [viewMode, setViewMode] = useState('all');
+    const [viewMode, setViewMode] = useState('created');
 
     // Manejar el cambio de modo de visualización
     const handleViewModeChange = (mode) => {

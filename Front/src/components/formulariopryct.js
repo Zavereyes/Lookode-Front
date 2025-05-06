@@ -3,8 +3,9 @@ import './formulariopryct.css';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { projectService } from '../services/projectService';
 import Select from 'react-select';
+import { FiEdit2 } from "react-icons/fi";
 
-const Formularioprcyt = ({ showContinuarButton = true, showEditarButton = true, showEliminarButton = true }) => {
+const Formularioprcyt = ({ showContinuarButton = true, showEditarButton = true, showEliminarButton = true, isEditMode = false }) => {
     const [selectedImage, setSelectedImage] = useState(null);
     const [imageFile, setImageFile] = useState(null);
     const [titulo, setTitulo] = useState('');
@@ -12,10 +13,12 @@ const Formularioprcyt = ({ showContinuarButton = true, showEditarButton = true, 
     const [availableTags, setAvailableTags] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState('');
+    const [project, setProject] = useState(null);
     const navigate = useNavigate();
     
-  const { idProyecto } = useParams(); // Obtener idProyecto de la URL
+    const { idProyecto } = useParams(); // Obtener idProyecto de la URL
 
     useEffect(() => {
         const fetchTags = async () => {
@@ -32,7 +35,59 @@ const Formularioprcyt = ({ showContinuarButton = true, showEditarButton = true, 
         };
 
         fetchTags();
-    }, []);
+
+        // Si estamos en modo edición y tenemos un ID de proyecto, cargar los datos
+        if (isEditMode && idProyecto) {
+            loadProjectData();
+        }
+    }, [isEditMode, idProyecto]);
+
+    const loadProjectData = async () => {
+        try {
+            setIsLoading(true);
+            const projectData = await projectService.getProjectById(idProyecto);
+            
+            // Establecer el título
+            setTitulo(projectData.proyecto.titulo);
+            
+            // Convertir los tags al formato esperado por el componente Select
+            const projectTags = projectData.tags.map(tag => ({
+                value: tag.NombreTag,
+                label: tag.NombreTag
+            }));
+            setTags(projectTags);
+            
+            // Cargar la primera imagen del proyecto si existe
+            if (projectData.contenidos && projectData.contenidos.length > 0) {
+                const firstImage = projectData.contenidos.find(content => content.tipo === 'imagen');
+                if (firstImage) {
+                    const imageUrl = firstImage.url;
+                    // Cargar la imagen
+                    try {
+                        const imageResponse = await fetch(`http://localhost:3001${imageUrl}`, {
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                            }
+                        });
+                        
+                        if (imageResponse.ok) {
+                            const blob = await imageResponse.blob();
+                            setSelectedImage(URL.createObjectURL(blob));
+                        }
+                    } catch (error) {
+                        console.error('Error loading project image:', error);
+                    }
+                }
+            }
+            
+            setProject(projectData);
+        } catch (error) {
+            console.error('Error loading project data:', error);
+            setError('Error al cargar los datos del proyecto');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
@@ -91,18 +146,53 @@ const Formularioprcyt = ({ showContinuarButton = true, showEditarButton = true, 
                 imagen: imageFile,
             };
     
-            const response = await projectService.createProject(projectData);
-    
-            if (response.idProyecto) {
-                navigate(`/addcontentpryct/${response.idProyecto}`);
+            // Si estamos en modo edición, actualizar el proyecto existente
+            if (isEditMode && idProyecto) {
+                await projectService.updateProject(idProyecto, projectData);
+                navigate('/perfil'); // Redirigir al perfil después de editar
             } else {
-                navigate('/perfil');
+                // Crear nuevo proyecto
+                const response = await projectService.createProject(projectData);
+                if (response.idProyecto) {
+                    navigate(`/addcontentpryct/${response.idProyecto}`);
+                } else {
+                    navigate('/perfil');
+                }
             }
         } catch (error) {
-            console.error('Error al crear proyecto:', error);
-            setError('Error al crear el proyecto. Inténtalo de nuevo.');
+            console.error('Error al procesar proyecto:', error);
+            setError(`Error al ${isEditMode ? 'actualizar' : 'crear'} el proyecto. Inténtalo de nuevo.`);
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleSaveChanges = async () => {
+        if (!titulo) {
+            setError('El título es obligatorio');
+            return;
+        }
+    
+        setIsSaving(true);
+        setError('');
+    
+        try {
+            // Asegurar que los tags sean un array de strings
+            const tagValues = tags.map(tag => tag.value);
+            
+            const projectData = {
+                titulo: titulo,
+                tags: tagValues,
+                imagen: imageFile, // Solo se enviará si se seleccionó una nueva imagen
+            };
+    
+            await projectService.updateProject(idProyecto, projectData);
+            navigate('/perfil'); // Redirigir al perfil después de guardar
+        } catch (error) {
+            console.error('Error al actualizar proyecto:', error);
+            setError('Error al actualizar el proyecto. Inténtalo de nuevo.');
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -132,6 +222,10 @@ const Formularioprcyt = ({ showContinuarButton = true, showEditarButton = true, 
         }
     };
 
+    if (isLoading && isEditMode) {
+        return <div className="loading">Cargando datos del proyecto...</div>;
+    }
+
     return (
         <div className="main-content">
             <div className="container">
@@ -148,8 +242,9 @@ const Formularioprcyt = ({ showContinuarButton = true, showEditarButton = true, 
                         {selectedImage ? (
                             <img src={selectedImage} alt="Vista previa" className="preview-image" />
                         ) : (
-                            <button type="button" required className="btn btn-upload">Cargar</button>
+                            <button type="button" className="btn btn-upload">Cargar</button>
                         )}
+                        
                     </div>
 
                     <div className="form-area">
@@ -183,7 +278,7 @@ const Formularioprcyt = ({ showContinuarButton = true, showEditarButton = true, 
                                 <button type="button" className="btn btn-exit">Salir</button>
                             </Link>
 
-                            {showContinuarButton && (
+                            {showContinuarButton && !isEditMode && (
                                 <button
                                     type="submit"
                                     className="btn btn-continue"
@@ -204,8 +299,15 @@ const Formularioprcyt = ({ showContinuarButton = true, showEditarButton = true, 
                                 </button>
                             )}
 
-                            {showEditarButton && (
-                                <button type="button" className="btn btn-editar">Editar</button>
+                            {showEditarButton && isEditMode && (
+                                <button 
+                                    type="button" 
+                                    className="btn btn-editar"
+                                    onClick={handleSaveChanges}
+                                    disabled={isSaving}
+                                >
+                                    {isSaving ? 'Guardando...' : 'Guardar Cambios'}
+                                </button>
                             )}
                         </div>
                     </div>

@@ -57,10 +57,54 @@ const deleteProject = async (projectId) => {
   }
 };
 
+// Obtener un proyecto por ID
+const getProjectById = async (projectId) => {
+  try {
+    const response = await axios.get(`${API_URL}/proyectos/${projectId}/detalles`);
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener proyecto:', error);
+    throw error;
+  }
+};
+
+// Actualizar un proyecto existente
+const updateProject = async (projectId, projectData) => {
+  try {
+    const formData = new FormData();
+    formData.append('titulo', projectData.titulo);
+    
+    // Manejo de tags
+    if (projectData.tags && projectData.tags.length > 0) {
+      projectData.tags.forEach(tag => {
+        formData.append('tags[]', tag);
+      });
+    }
+    
+    // Agregar imagen solo si se proporciona una nueva
+    if (projectData.imagen) {
+      formData.append('imagen', projectData.imagen);
+    }
+    
+    const response = await axios.put(`${API_URL}/proyectos/${projectId}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error('Error al actualizar proyecto:', error);
+    throw error;
+  }
+};
+
 export const projectService = {
   createProject,
   getAllTags,
-  deleteProject
+  deleteProject,
+  getProjectById,
+  updateProject
 };
 
 export default projectService;

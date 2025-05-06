@@ -1073,6 +1073,217 @@ app.delete('/proyectos/:idProyecto', verificarToken, (req, res) => {
   });
 });
 
+////Editar Proyecto
+app.put('/proyectos/:idProyecto', verificarToken, upload.single('imagen'), (req, res) => {
+  const idProyecto = req.params.idProyecto;
+  const { titulo } = req.body;
+  let tags = req.body.tags;
+  const idUsuario = req.usuario.idUsuario;
+  const nuevaImagen = req.file ? req.file.buffer : null;
+  
+  const queryVerificarPropietario = 'SELECT idProyecto FROM Proyectos WHERE idProyecto = ? AND idUsuario = ?';
+  
+  db.query(queryVerificarPropietario, [idProyecto, idUsuario], (error, results) => {
+    if (error) {
+      console.error('Error al verificar propiedad del proyecto:', error);
+      return res.status(500).json({ message: "Error al actualizar proyecto" });
+    }
+    
+    if (results.length === 0) {
+      return res.status(403).json({ message: "No tienes permiso para actualizar este proyecto" });
+    }
+    
+    
+    if (!tags) {
+      tags = [];
+    } else if (!Array.isArray(tags)) {
+      tags = [tags]; 
+    }
+    
+    // Iniciar transacción
+    db.beginTransaction((err) => {
+      if (err) {
+        console.error('Error al iniciar transacción:', err);
+        return res.status(500).json({ message: "Error al actualizar proyecto" });
+      }
+      
+      // 1. Actualizar el título del proyecto
+      const queryActualizarProyecto = 'UPDATE Proyectos SET Titulo = ? WHERE idProyecto = ?';
+      
+      db.query(queryActualizarProyecto, [titulo, idProyecto], (error) => {
+        if (error) {
+          return db.rollback(() => {
+            console.error('Error al actualizar proyecto:', error);
+            res.status(500).json({ message: "Error al actualizar proyecto" });
+          });
+        }
+        
+        // 2. Si hay una nueva imagen, insertarla
+        let siguientePaso = actualizarTags;
+        
+        if (nuevaImagen) {
+          // Verificar si ya existe una imagen para este proyecto
+          const queryVerificarImagen = 'SELECT idContenido FROM Contenidos WHERE idProyecto = ? AND tipo = "imagen" LIMIT 1';
+          
+          db.query(queryVerificarImagen, [idProyecto], (error, imagenResults) => {
+            if (error) {
+              return db.rollback(() => {
+                console.error('Error al verificar imagen existente:', error);
+                res.status(500).json({ message: "Error al actualizar imagen" });
+              });
+            }
+            
+            if (imagenResults.length > 0) {
+              // Actualizar la imagen existente
+              const idContenido = imagenResults[0].idContenido;
+              const queryActualizarImagen = 'UPDATE Contenidos SET contenido = ? WHERE idContenido = ?';
+              
+              db.query(queryActualizarImagen, [nuevaImagen, idContenido], (error) => {
+                if (error) {
+                  return db.rollback(() => {
+                    console.error('Error al actualizar imagen:', error);
+                    res.status(500).json({ message: "Error al actualizar imagen" });
+                  });
+                }
+                siguientePaso();
+              });
+            } else {
+              // Insertar nueva imagen
+              const queryInsertarImagen = 'INSERT INTO Contenidos (tipo, contenido, idProyecto) VALUES (?, ?, ?)';
+              
+              db.query(queryInsertarImagen, ['imagen', nuevaImagen, idProyecto], (error) => {
+                if (error) {
+                  return db.rollback(() => {
+                    console.error('Error al insertar imagen:', error);
+                    res.status(500).json({ message: "Error al guardar imagen" });
+                  });
+                }
+                siguientePaso();
+              });
+            }
+          });
+        } else {
+          siguientePaso();
+        }
+        
+        // 3. Actualizar tags
+        function actualizarTags() {
+          // Primero eliminar todas las relaciones de tags existentes
+          const queryEliminarTags = 'DELETE FROM TagEnProyecto WHERE idProyecto = ?';
+          
+          db.query(queryEliminarTags, [idProyecto], (error) => {
+            if (error) {
+              return db.rollback(() => {
+                console.error('Error al eliminar tags existentes:', error);
+                res.status(500).json({ message: "Error al actualizar tags" });
+              });
+            }
+            
+            // Si no hay nuevos tags, terminar
+            if (tags.length === 0) {
+              return finalizarTransaccion();
+            }
+            
+            // Procesar los nuevos tags
+            const processedTags = [];
+            let tagsProcessed = 0;
+            
+            tags.forEach((tag) => {
+              // Verificar si el tag ya existe
+              const checkTagQuery = 'SELECT idTag FROM Tags WHERE NombreTag = ?';
+              
+              db.query(checkTagQuery, [tag], (error, tagResult) => {
+                if (error) {
+                  return db.rollback(() => {
+                    console.error('Error al verificar tag:', error);
+                    res.status(500).json({ message: "Error al procesar tags" });
+                  });
+                }
+                
+                let tagId;
+                
+                if (tagResult.length > 0) {
+                  // El tag ya existe, obtener su ID
+                  tagId = tagResult[0].idTag;
+                  processedTags.push(tagId);
+                  checkAllTagsProcessed();
+                } else {
+                  // El tag no existe, crearlo
+                  const insertTagQuery = 'INSERT INTO Tags (NombreTag, idUsuario) VALUES (?, ?)';
+                  
+                  db.query(insertTagQuery, [tag, idUsuario], (error, newTagResult) => {
+                    if (error) {
+                      return db.rollback(() => {
+                        console.error('Error al crear tag:', error);
+                        res.status(500).json({ message: "Error al crear tag" });
+                      });
+                    }
+                    
+                    tagId = newTagResult.insertId;
+                    processedTags.push(tagId);
+                    checkAllTagsProcessed();
+                  });
+                }
+              });
+            });
+            
+            // Verificar si todos los tags han sido procesados
+            function checkAllTagsProcessed() {
+              tagsProcessed++;
+              
+              if (tagsProcessed === tags.length) {
+                // Relacionar los tags con el proyecto
+                let tagRelationsProcessed = 0;
+                
+                processedTags.forEach((tagId) => {
+                  const tagRelationQuery = 'INSERT INTO TagEnProyecto (idProyecto, idTag) VALUES (?, ?)';
+                  
+                  db.query(tagRelationQuery, [idProyecto, tagId], (error) => {
+                    if (error) {
+                      return db.rollback(() => {
+                        console.error('Error al relacionar tag con proyecto:', error);
+                        res.status(500).json({ message: "Error al relacionar tag con proyecto" });
+                      });
+                    }
+                    
+                    tagRelationsProcessed++;
+                    
+                    if (tagRelationsProcessed === processedTags.length) {
+                      finalizarTransaccion();
+                    }
+                  });
+                });
+              }
+            }
+          });
+        }
+        
+        // Finalizar la transacción
+        function finalizarTransaccion() {
+          db.commit((err) => {
+            if (err) {
+              return db.rollback(() => {
+                console.error('Error al confirmar transacción:', err);
+                res.status(500).json({ message: "Error al actualizar proyecto" });
+              });
+            }
+            
+            res.json({ 
+              message: "Proyecto actualizado correctamente", 
+              idProyecto: idProyecto 
+            });
+          });
+        }
+      });
+    });
+  });
+});
+
+// Asegúrate de que esta parte esté al final del archivo, después de todas las rutas
+// app.listen(port, () => {
+//     console.log(`Servidor escuchando en el puerto ${port}`);
+// });
+
 
 // Añade esto a tu index.js
 app.get('/test', (req, res) => {
