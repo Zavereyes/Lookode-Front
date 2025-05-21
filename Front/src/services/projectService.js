@@ -1,7 +1,7 @@
 // src/services/projectService.js
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3001';
+const API_URL = 'https://lookode-unk7.vercel.app';
 
 // Crear un nuevo proyecto
 const createProject = async (projectData) => {

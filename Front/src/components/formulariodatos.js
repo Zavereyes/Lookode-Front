@@ -82,7 +82,7 @@ const Formulariodatos = ({
     const desactivarCuenta = () => {
         const token = localStorage.getItem('token');
 
-        axios.put(`http://localhost:3001/usuario/desactivar/${usuario.idUsuario}`, {}, {
+        axios.put(`https://lookode-unk7.vercel.app/usuario/desactivar/${usuario.idUsuario}`, {}, {
             headers: { 'Authorization': `Bearer ${token}` }
         })
         .then(response => {
@@ -108,7 +108,7 @@ const Formulariodatos = ({
     
     useEffect(() => {
         if (modo === 'editar' && usuario?.idUsuario && !fileImg) { 
-            axios.get(`http://localhost:3001/usuario/avatar/${usuario.idUsuario}`, { 
+            axios.get(`https://lookode-unk7.vercel.app/usuario/avatar/${usuario.idUsuario}`, { 
                 responseType: 'blob',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -208,7 +208,7 @@ const Formulariodatos = ({
 
         if (modo === 'registro') {
             // Proceso de registro
-            axios.post("http://localhost:3001/registro", formData, {
+            axios.post("https://lookode-unk7.vercel.app/registro", formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             })
             .then(response => {
@@ -241,7 +241,7 @@ const Formulariodatos = ({
             // Proceso de edición
             const token = localStorage.getItem('token');
             
-            axios.put("http://localhost:3001/usuario/editar", formData, {
+            axios.put("https://lookode-unk7.vercel.app/usuario/editar", formData, {
                 headers: { 
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `Bearer ${token}`

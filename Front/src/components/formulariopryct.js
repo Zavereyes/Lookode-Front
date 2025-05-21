@@ -64,7 +64,7 @@ const Formularioprcyt = ({ showContinuarButton = true, showEditarButton = true, 
                     const imageUrl = firstImage.url;
                     // Cargar la imagen
                     try {
-                        const imageResponse = await fetch(`http://localhost:3001${imageUrl}`, {
+                        const imageResponse = await fetch(`https://lookode-unk7.vercel.app${imageUrl}`, {
                             headers: {
                                 'Authorization': `Bearer ${localStorage.getItem('token')}`
                             }
