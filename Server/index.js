@@ -11,7 +11,7 @@ const port = 3001;
 const JWT_SECRET = 'tu_clave_secreta_muy_segura';
 
 const corsOptions = {
-    origin: 'http://localhost:3000', // Permite solo solicitudes desde el frontend
+    origin: 'https://lookode-d9yt.vercel.app', // Permite solo solicitudes desde el frontend
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true, // Permite el envío de cookies o credenciales si las necesitas
     optionsSuccessStatus: 204
