@@ -1,6 +1,6 @@
 // Server/index.js
 const express = require('express');
-const mysql = require('mysql');
+const mysql2 = require('mysql2');
 const multer = require('multer');
 const cors = require('cors');
 const jwt = require('jsonwebtoken'); // Nueva importación
@@ -24,13 +24,13 @@ app.use(express.urlencoded({ extended: true }));
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-const db = mysql.createConnection({
-    host: "localhost",
+const db = mysql2.createConnection({
+    host: "turntable.proxy.rlwy.net",
     user: "root",
-    password: "",
-    database: "lookodedb"
+    password: "RwOwYrIlxHWuzZDPjBeJbTjgEMHcwmvB",
+    database: "Lookode",
+    port: 14593
 });
-
 db.connect((err) => {
     if (err) throw err;
     console.log("Conectado a la base de datos!");
@@ -58,7 +58,7 @@ app.post('/registro', upload.single('fileImg'), (req, res) => {
     const { nombre, correo, contra, twitter, ig } = req.body;
     const img64 = req.file ? req.file.buffer : null;
 
-    const query = 'INSERT INTO Usuarios (nickname, correo, contraseña, twitter, ig, avatar) VALUES (?, ?, ?, ?, ?,?)';
+    const query = 'INSERT INTO usuarios (nickname, correo, contraseña, twitter, ig, avatar) VALUES (?, ?, ?, ?, ?,?)';
     db.query(query, [nombre, correo, contra, twitter, ig, img64], (error, results) => {
         if (error) {
             console.error(error);
@@ -71,7 +71,7 @@ app.post('/registro', upload.single('fileImg'), (req, res) => {
 app.post('/login', (req, res) => {
   const { correo, contraseña } = req.body;
 
-  const query = 'SELECT * FROM Usuarios WHERE correo = ? AND contraseña = ?';
+  const query = 'SELECT * FROM usuarios WHERE correo = ? AND contraseña = ?';
   db.query(query, [correo, contraseña], (error, results) => {
       if (error) {
           console.error(error);
@@ -128,7 +128,7 @@ app.post('/login', (req, res) => {
 app.post('/reactivar-cuenta', (req, res) => {
   const { idUsuario } = req.body;
   
-  const query = 'UPDATE Usuarios SET activo = 1 WHERE idUsuario = ?';
+  const query = 'UPDATE usuarios SET activo = 1 WHERE idUsuario = ?';
   db.query(query, [idUsuario], (error, results) => {
       if (error) {
           console.error('Error al reactivar cuenta:', error);
@@ -149,7 +149,7 @@ app.post('/reactivar-cuenta', (req, res) => {
 app.get('/usuario/avatar/:id', (req, res) => {
   const idUsuario = req.params.id;
   
-  const query = 'SELECT avatar FROM Usuarios WHERE idUsuario = ?';
+  const query = 'SELECT avatar FROM usuarios WHERE idUsuario = ?';
   db.query(query, [idUsuario], (error, results) => {
       if (error) {
           console.error('Error al obtener avatar:', error);
@@ -170,7 +170,7 @@ app.get('/usuario/avatar/:id', (req, res) => {
 app.put('/usuario/desactivar/:id', verificarToken, (req, res) => {
   const idUsuario = req.params.id;
 
-  const query = 'UPDATE Usuarios SET activo = 0 WHERE idUsuario = ?';
+  const query = 'UPDATE usuarios SET activo = 0 WHERE idUsuario = ?';
 
   db.query(query, [idUsuario], (error, results) => {
       if (error) {
@@ -200,7 +200,7 @@ app.put('/usuario/editar', verificarToken, upload.single('fileImg'), (req, res) 
       }
       
       // Construir la query dinámicamente en base a los campos que se quieren actualizar
-      let query = 'UPDATE Usuarios SET ';
+      let query = 'UPDATE usuarios SET ';
       const params = [];
       const fields = [];
       
@@ -253,7 +253,7 @@ app.put('/usuario/editar', verificarToken, upload.single('fileImg'), (req, res) 
           }
           
           // Obtener los datos actualizados del usuario
-          const getUserQuery = 'SELECT idUsuario, nickname, correo, contraseña, twitter, ig FROM Usuarios WHERE idUsuario = ?';
+          const getUserQuery = 'SELECT idUsuario, nickname, correo, contraseña, twitter, ig FROM usuarios WHERE idUsuario = ?';
           db.query(getUserQuery, [idUsuario], (error, userResults) => {
               if (error) {
                   return db.rollback(() => {
@@ -328,7 +328,7 @@ app.post('/proyectos', verificarToken, upload.single('imagen'), (req, res) => {
     }
     
     // 1. Insertar el proyecto
-    const proyectoQuery = 'INSERT INTO Proyectos (Titulo, idUsuario) VALUES (?, ?)';
+    const proyectoQuery = 'INSERT INTO proyectos (Titulo, idUsuario) VALUES (?, ?)';
     db.query(proyectoQuery, [titulo, idUsuario], (error, proyectoResult) => {
       if (error) {
         return db.rollback(() => {
@@ -339,9 +339,9 @@ app.post('/proyectos', verificarToken, upload.single('imagen'), (req, res) => {
       
       const idProyecto = proyectoResult.insertId;
       
-      // 2. Si hay imagen, insertar en Contenidos
+      // 2. Si hay imagen, insertar en contenidos
       if (imagen) {
-        const contenidoQuery = 'INSERT INTO Contenidos (tipo, contenido, idProyecto) VALUES (?, ?, ?)';
+        const contenidoQuery = 'INSERT INTO contenidos (tipo, contenido, idProyecto) VALUES (?, ?, ?)';
         db.query(contenidoQuery, ['imagen', imagen, idProyecto], (error) => {
           if (error) {
             return db.rollback(() => {
@@ -382,7 +382,7 @@ app.post('/proyectos', verificarToken, upload.single('imagen'), (req, res) => {
         
         tags.forEach((tag) => {
           // Verificar si el tag ya existe para este usuario
-          const checkTagQuery = 'SELECT idTag FROM Tags WHERE NombreTag = ?';
+          const checkTagQuery = 'SELECT idTag FROM tags WHERE NombreTag = ?';
           db.query(checkTagQuery, [tag], (error, tagResult) => {
             if (error) {
               return db.rollback(() => {
@@ -400,7 +400,7 @@ app.post('/proyectos', verificarToken, upload.single('imagen'), (req, res) => {
               checkAllTagsProcessed();
             } else {
               // El tag no existe, crearlo
-              const insertTagQuery = 'INSERT INTO Tags (NombreTag, idUsuario) VALUES (?, ?)';
+              const insertTagQuery = 'INSERT INTO tags (NombreTag, idUsuario) VALUES (?, ?)';
               db.query(insertTagQuery, [tag, idUsuario], (error, newTagResult) => {
                 if (error) {
                   return db.rollback(() => {
@@ -426,7 +426,7 @@ app.post('/proyectos', verificarToken, upload.single('imagen'), (req, res) => {
             let tagRelationsProcessed = 0;
             
             processedTags.forEach((tagId) => {
-              const tagRelationQuery = 'INSERT INTO TagEnProyecto (idProyecto, idTag) VALUES (?, ?)';
+              const tagRelationQuery = 'INSERT INTO tagenproyecto (idProyecto, idTag) VALUES (?, ?)';
               db.query(tagRelationQuery, [idProyecto, tagId], (error) => {
                 if (error) {
                   return db.rollback(() => {
@@ -464,7 +464,7 @@ app.post('/proyectos', verificarToken, upload.single('imagen'), (req, res) => {
 
 //obtener tags.
 app.get('/tags', (req, res) => {
-  const query = 'SELECT idTag, NombreTag FROM Tags';
+  const query = 'SELECT idTag, NombreTag FROM tags';
 
   db.query(query, (error, results) => {
       if (error) {
@@ -508,7 +508,7 @@ app.post('/proyectos/contenido', verificarToken, upload.array('contenido'), (req
     contenidos.forEach((contenido, index) => {
       const tipo = tiposArray[index] || 'imagen'; // Default to imagen if not specified
       
-      const query = 'INSERT INTO Contenidos (tipo, contenido, idProyecto) VALUES (?, ?, ?)';
+      const query = 'INSERT INTO contenidos (tipo, contenido, idProyecto) VALUES (?, ?, ?)';
       
       db.query(query, [tipo, contenido.buffer, idProyecto], (error, result) => {
         if (error) {
@@ -547,8 +547,8 @@ app.post('/proyectos/contenido', verificarToken, upload.array('contenido'), (req
 app.get('/proyectos', verificarToken, (req, res) => {
   const query = `
     SELECT p.idProyecto, p.Titulo 
-    FROM Proyectos p
-    JOIN Usuarios u ON p.idUsuario = u.idUsuario
+    FROM proyectos p
+    JOIN usuarios u ON p.idUsuario = u.idUsuario
     WHERE u.activo = 1
   `;
 
@@ -570,7 +570,7 @@ app.get('/proyectos/:idProyecto/primera-imagen', verificarToken, (req, res) => {
   
   const query = `
     SELECT contenido 
-    FROM Contenidos 
+    FROM contenidos 
     WHERE idProyecto = ? AND tipo = 'imagen' 
     ORDER BY idContenido ASC 
     LIMIT 1
@@ -609,8 +609,8 @@ app.get('/proyectos/:idProyecto/detalles', verificarToken, (req, res) => {
     const queryProyecto = `
       SELECT p.idProyecto, p.Titulo, 
              u.idUsuario, u.avatar, u.nickname, u.twitter, u.ig
-      FROM Proyectos p
-      JOIN Usuarios u ON p.idUsuario = u.idUsuario
+      FROM proyectos p
+      JOIN usuarios u ON p.idUsuario = u.idUsuario
       WHERE p.idProyecto = ?
     `;
     
@@ -634,7 +634,7 @@ app.get('/proyectos/:idProyecto/detalles', verificarToken, (req, res) => {
       // 2. Obtener los IDs de contenido
       const queryContenidos = `
         SELECT idContenido, tipo
-        FROM Contenidos
+        FROM contenidos
         WHERE idProyecto = ?
         ORDER BY idContenido ASC
       `;
@@ -650,8 +650,8 @@ app.get('/proyectos/:idProyecto/detalles', verificarToken, (req, res) => {
         // 3. Obtener los tags del proyecto
         const queryTags = `
           SELECT t.idTag, t.NombreTag
-          FROM Tags t
-          JOIN TagEnProyecto tp ON t.idTag = tp.idTag
+          FROM tags t
+          JOIN tagenproyecto tp ON t.idTag = tp.idTag
           WHERE tp.idProyecto = ?
         `;
         
@@ -705,7 +705,7 @@ app.get('/proyectos/:idProyecto/detalles', verificarToken, (req, res) => {
 app.get('/contenidos/:idContenido', (req, res) => {
   const idContenido = req.params.idContenido;
   
-  const query = 'SELECT tipo, contenido FROM Contenidos WHERE idContenido = ?';
+  const query = 'SELECT tipo, contenido FROM contenidos WHERE idContenido = ?';
   
   db.query(query, [idContenido], (error, results) => {
     if (error) {
@@ -750,7 +750,7 @@ app.get('/favoritos/check/:idProyecto', verificarToken, (req, res) => {
   const idUsuario = req.usuario.idUsuario;
   
   // Buscar el favorito del usuario
-  const queryBuscarFavorito = 'SELECT idFavorito FROM Favoritos WHERE idUsuario = ? LIMIT 1';
+  const queryBuscarFavorito = 'SELECT idFavorito FROM favoritos WHERE idUsuario = ? LIMIT 1';
   
   db.query(queryBuscarFavorito, [idUsuario], (error, favoritos) => {
     if (error) {
@@ -766,7 +766,7 @@ app.get('/favoritos/check/:idProyecto', verificarToken, (req, res) => {
     const idFavorito = favoritos[0].idFavorito;
     
     // Verificar si el proyecto está en favoritos
-    const queryCheckProyecto = 'SELECT COUNT(*) as count FROM ProyectoEnFavorito WHERE idFavorito = ? AND idProyecto = ?';
+    const queryCheckProyecto = 'SELECT COUNT(*) as count FROM proyectoenfavorito WHERE idFavorito = ? AND idProyecto = ?';
     
     db.query(queryCheckProyecto, [idFavorito, idProyecto], (error, results) => {
       if (error) {
@@ -794,7 +794,7 @@ app.post('/favoritos/add', verificarToken, (req, res) => {
     
     try {
       // Verificar si el usuario ya tiene una lista de favoritos
-      const queryCheckFavoritos = 'SELECT idFavorito FROM Favoritos WHERE idUsuario = ? LIMIT 1';
+      const queryCheckFavoritos = 'SELECT idFavorito FROM favoritos WHERE idUsuario = ? LIMIT 1';
       
       db.query(queryCheckFavoritos, [idUsuario], (error, favoritos) => {
         if (error) {
@@ -808,7 +808,7 @@ app.post('/favoritos/add', verificarToken, (req, res) => {
         
         // Si no tiene lista de favoritos, crear una
         if (favoritos.length === 0) {
-          const queryCrearFavorito = 'INSERT INTO Favoritos (idUsuario) VALUES (?)';
+          const queryCrearFavorito = 'INSERT INTO favoritos (idUsuario) VALUES (?)';
           
           db.query(queryCrearFavorito, [idUsuario], (error, result) => {
             if (error) {
@@ -829,7 +829,7 @@ app.post('/favoritos/add', verificarToken, (req, res) => {
         
         // Función para insertar el proyecto en la lista de favoritos
         function insertarProyectoEnFavorito(idFavorito) {
-          const queryInsertProyecto = 'INSERT INTO ProyectoEnFavorito (idFavorito, idProyecto) VALUES (?, ?)';
+          const queryInsertProyecto = 'INSERT INTO proyectoenfavorito (idFavorito, idProyecto) VALUES (?, ?)';
           
           db.query(queryInsertProyecto, [idFavorito, idProyecto], (error) => {
             if (error) {
@@ -868,7 +868,7 @@ app.delete('/favoritos/remove/:idProyecto', verificarToken, (req, res) => {
   const idUsuario = req.usuario.idUsuario;
   
   // Buscar el idFavorito del usuario
-  const queryBuscarFavorito = 'SELECT idFavorito FROM Favoritos WHERE idUsuario = ? LIMIT 1';
+  const queryBuscarFavorito = 'SELECT idFavorito FROM favoritos WHERE idUsuario = ? LIMIT 1';
   
   db.query(queryBuscarFavorito, [idUsuario], (error, favoritos) => {
     if (error) {
@@ -882,8 +882,8 @@ app.delete('/favoritos/remove/:idProyecto', verificarToken, (req, res) => {
     
     const idFavorito = favoritos[0].idFavorito;
     
-    // Eliminar la relación en ProyectoEnFavorito
-    const queryEliminar = 'DELETE FROM ProyectoEnFavorito WHERE idFavorito = ? AND idProyecto = ?';
+    // Eliminar la relación en proyectoenfavorito
+    const queryEliminar = 'DELETE FROM proyectoenfavorito WHERE idFavorito = ? AND idProyecto = ?';
     
     db.query(queryEliminar, [idFavorito, idProyecto], (error, result) => {
       if (error) {
@@ -907,10 +907,10 @@ app.get('/favoritos/proyectos', verificarToken, (req, res) => {
   
   const query = `
     SELECT p.idProyecto, p.Titulo 
-    FROM Proyectos p
-    JOIN ProyectoEnFavorito pf ON p.idProyecto = pf.idProyecto
-    JOIN Favoritos f ON pf.idFavorito = f.idFavorito
-    JOIN Usuarios u ON p.idUsuario = u.idUsuario
+    FROM proyectos p
+    JOIN proyectoenfavorito pf ON p.idProyecto = pf.idProyecto
+    JOIN favoritos f ON pf.idFavorito = f.idFavorito
+    JOIN usuarios u ON p.idUsuario = u.idUsuario
     WHERE f.idUsuario = ? AND u.activo = 1
   `;
   
@@ -931,7 +931,7 @@ app.get('/proyectos/usuario', verificarToken, (req, res) => {
   
   const query = `
     SELECT p.idProyecto, p.Titulo 
-    FROM Proyectos p
+    FROM proyectos p
     WHERE p.idUsuario = ?
   `;
   
@@ -969,10 +969,10 @@ app.get('/proyectos/buscar', verificarToken, (req, res) => {
   
   const query = `
     SELECT DISTINCT p.idProyecto, p.Titulo 
-    FROM Proyectos p
-    LEFT JOIN TagEnProyecto tp ON p.idProyecto = tp.idProyecto
-    LEFT JOIN Tags t ON tp.idTag = t.idTag
-    JOIN Usuarios u ON p.idUsuario = u.idUsuario
+    FROM proyectos p
+    LEFT JOIN tagenproyecto tp ON p.idProyecto = tp.idProyecto
+    LEFT JOIN tags t ON tp.idTag = t.idTag
+    JOIN usuarios u ON p.idUsuario = u.idUsuario
     WHERE ${conditions} AND u.activo = 1
   `;
   
@@ -992,7 +992,7 @@ app.delete('/proyectos/:idProyecto', verificarToken, (req, res) => {
   const idUsuario = req.usuario.idUsuario;
   
   
-  const queryVerificarPropietario = 'SELECT idProyecto FROM Proyectos WHERE idProyecto = ? AND idUsuario = ?';
+  const queryVerificarPropietario = 'SELECT idProyecto FROM proyectos WHERE idProyecto = ? AND idUsuario = ?';
   
   db.query(queryVerificarPropietario, [idProyecto, idUsuario], (error, results) => {
     if (error) {
@@ -1010,8 +1010,8 @@ app.delete('/proyectos/:idProyecto', verificarToken, (req, res) => {
         return res.status(500).json({ message: "Error al eliminar proyecto" });
       }
       
-      // 1. Eliminar registros en ProyectoEnFavorito
-      const queryEliminarFavoritos = 'DELETE FROM ProyectoEnFavorito WHERE idProyecto = ?';
+      // 1. Eliminar registros en proyectoenfavorito
+      const queryEliminarFavoritos = 'DELETE FROM proyectoenfavorito WHERE idProyecto = ?';
       
       db.query(queryEliminarFavoritos, [idProyecto], (error) => {
         if (error) {
@@ -1021,8 +1021,8 @@ app.delete('/proyectos/:idProyecto', verificarToken, (req, res) => {
           });
         }
         
-        // 2. Eliminar registros en TagEnProyecto
-        const queryEliminarTags = 'DELETE FROM TagEnProyecto WHERE idProyecto = ?';
+        // 2. Eliminar registros en tagenproyecto
+        const queryEliminarTags = 'DELETE FROM tagenproyecto WHERE idProyecto = ?';
         
         db.query(queryEliminarTags, [idProyecto], (error) => {
           if (error) {
@@ -1032,8 +1032,8 @@ app.delete('/proyectos/:idProyecto', verificarToken, (req, res) => {
             });
           }
           
-          // 3. Eliminar registros en Contenidos
-          const queryEliminarContenidos = 'DELETE FROM Contenidos WHERE idProyecto = ?';
+          // 3. Eliminar registros en contenidos
+          const queryEliminarContenidos = 'DELETE FROM contenidos WHERE idProyecto = ?';
           
           db.query(queryEliminarContenidos, [idProyecto], (error) => {
             if (error) {
@@ -1044,7 +1044,7 @@ app.delete('/proyectos/:idProyecto', verificarToken, (req, res) => {
             }
             
             // 4. Finalmente, eliminar el proyecto
-            const queryEliminarProyecto = 'DELETE FROM Proyectos WHERE idProyecto = ?';
+            const queryEliminarProyecto = 'DELETE FROM proyectos WHERE idProyecto = ?';
             
             db.query(queryEliminarProyecto, [idProyecto], (error) => {
               if (error) {
@@ -1081,7 +1081,7 @@ app.put('/proyectos/:idProyecto', verificarToken, upload.single('imagen'), (req,
   const idUsuario = req.usuario.idUsuario;
   const nuevaImagen = req.file ? req.file.buffer : null;
   
-  const queryVerificarPropietario = 'SELECT idProyecto FROM Proyectos WHERE idProyecto = ? AND idUsuario = ?';
+  const queryVerificarPropietario = 'SELECT idProyecto FROM proyectos WHERE idProyecto = ? AND idUsuario = ?';
   
   db.query(queryVerificarPropietario, [idProyecto, idUsuario], (error, results) => {
     if (error) {
@@ -1108,7 +1108,7 @@ app.put('/proyectos/:idProyecto', verificarToken, upload.single('imagen'), (req,
       }
       
       // 1. Actualizar el título del proyecto
-      const queryActualizarProyecto = 'UPDATE Proyectos SET Titulo = ? WHERE idProyecto = ?';
+      const queryActualizarProyecto = 'UPDATE proyectos SET Titulo = ? WHERE idProyecto = ?';
       
       db.query(queryActualizarProyecto, [titulo, idProyecto], (error) => {
         if (error) {
@@ -1123,7 +1123,7 @@ app.put('/proyectos/:idProyecto', verificarToken, upload.single('imagen'), (req,
         
         if (nuevaImagen) {
           // Verificar si ya existe una imagen para este proyecto
-          const queryVerificarImagen = 'SELECT idContenido FROM Contenidos WHERE idProyecto = ? AND tipo = "imagen" LIMIT 1';
+          const queryVerificarImagen = 'SELECT idContenido FROM contenidos WHERE idProyecto = ? AND tipo = "imagen" LIMIT 1';
           
           db.query(queryVerificarImagen, [idProyecto], (error, imagenResults) => {
             if (error) {
@@ -1136,7 +1136,7 @@ app.put('/proyectos/:idProyecto', verificarToken, upload.single('imagen'), (req,
             if (imagenResults.length > 0) {
               // Actualizar la imagen existente
               const idContenido = imagenResults[0].idContenido;
-              const queryActualizarImagen = 'UPDATE Contenidos SET contenido = ? WHERE idContenido = ?';
+              const queryActualizarImagen = 'UPDATE contenidos SET contenido = ? WHERE idContenido = ?';
               
               db.query(queryActualizarImagen, [nuevaImagen, idContenido], (error) => {
                 if (error) {
@@ -1149,7 +1149,7 @@ app.put('/proyectos/:idProyecto', verificarToken, upload.single('imagen'), (req,
               });
             } else {
               // Insertar nueva imagen
-              const queryInsertarImagen = 'INSERT INTO Contenidos (tipo, contenido, idProyecto) VALUES (?, ?, ?)';
+              const queryInsertarImagen = 'INSERT INTO contenidos (tipo, contenido, idProyecto) VALUES (?, ?, ?)';
               
               db.query(queryInsertarImagen, ['imagen', nuevaImagen, idProyecto], (error) => {
                 if (error) {
@@ -1169,7 +1169,7 @@ app.put('/proyectos/:idProyecto', verificarToken, upload.single('imagen'), (req,
         // 3. Actualizar tags
         function actualizarTags() {
           // Primero eliminar todas las relaciones de tags existentes
-          const queryEliminarTags = 'DELETE FROM TagEnProyecto WHERE idProyecto = ?';
+          const queryEliminarTags = 'DELETE FROM tagenproyecto WHERE idProyecto = ?';
           
           db.query(queryEliminarTags, [idProyecto], (error) => {
             if (error) {
@@ -1190,7 +1190,7 @@ app.put('/proyectos/:idProyecto', verificarToken, upload.single('imagen'), (req,
             
             tags.forEach((tag) => {
               // Verificar si el tag ya existe
-              const checkTagQuery = 'SELECT idTag FROM Tags WHERE NombreTag = ?';
+              const checkTagQuery = 'SELECT idTag FROM tags WHERE NombreTag = ?';
               
               db.query(checkTagQuery, [tag], (error, tagResult) => {
                 if (error) {
@@ -1209,7 +1209,7 @@ app.put('/proyectos/:idProyecto', verificarToken, upload.single('imagen'), (req,
                   checkAllTagsProcessed();
                 } else {
                   // El tag no existe, crearlo
-                  const insertTagQuery = 'INSERT INTO Tags (NombreTag, idUsuario) VALUES (?, ?)';
+                  const insertTagQuery = 'INSERT INTO tags (NombreTag, idUsuario) VALUES (?, ?)';
                   
                   db.query(insertTagQuery, [tag, idUsuario], (error, newTagResult) => {
                     if (error) {
@@ -1236,7 +1236,7 @@ app.put('/proyectos/:idProyecto', verificarToken, upload.single('imagen'), (req,
                 let tagRelationsProcessed = 0;
                 
                 processedTags.forEach((tagId) => {
-                  const tagRelationQuery = 'INSERT INTO TagEnProyecto (idProyecto, idTag) VALUES (?, ?)';
+                  const tagRelationQuery = 'INSERT INTO tagenproyecto (idProyecto, idTag) VALUES (?, ?)';
                   
                   db.query(tagRelationQuery, [idProyecto, tagId], (error) => {
                     if (error) {
