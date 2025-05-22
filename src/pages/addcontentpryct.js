@@ -93,7 +93,7 @@ function AddContentPryct() {
             });
 
             // Send to backend with authorization header
-            const response = await axios.post('http://localhost:3001/proyectos/contenido', formData, {
+            const response = await axios.post('https://lookode-back.vercel.app/proyectos/contenido', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `Bearer ${token}` // Añadir el token de autorización
