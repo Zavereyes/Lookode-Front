@@ -22,13 +22,13 @@ function Grid({ showEditButton = false, viewMode = 'all', searchQuery = '' }) {
         // Determinar la URL basada en el modo de visualización
         if (viewMode === 'search' && searchQuery) {
           // URL para búsqueda
-          url = `https://lookode-back.vercel.app/proyectos/buscar?q=${encodeURIComponent(searchQuery)}`;
+          url = `https://lookode-back.onrender.com/proyectos/buscar?q=${encodeURIComponent(searchQuery)}`;
         } else if (viewMode === 'favorites') {
-          url = 'https://lookode-back.vercel.app/favoritos/proyectos';
+          url = 'https://lookode-back.onrender.com/favoritos/proyectos';
         } else if (viewMode === 'created') {
-          url = 'https://lookode-back.vercel.app/proyectos/usuario';
+          url = 'https://lookode-back.onrender.com/proyectos/usuario';
         } else {
-          url = 'https://lookode-back.vercel.app/proyectos'; // Mostrar todos los proyectos (default)
+          url = 'https://lookode-back.onrender.com/proyectos'; // Mostrar todos los proyectos (default)
         }
           
         // Fetch the projects based on viewMode
@@ -43,7 +43,7 @@ function Grid({ showEditButton = false, viewMode = 'all', searchQuery = '' }) {
         const projectsWithImages = await Promise.all(
           projectsResponse.data.map(async (project) => {
             try {
-              const imageResponse = await axios.get(`https://lookode-back.vercel.app/proyectos/${project.idProyecto}/primera-imagen`, {
+              const imageResponse = await axios.get(`https://lookode-back.onrender.com/proyectos/${project.idProyecto}/primera-imagen`, {
                 headers: {
                   'Authorization': `Bearer ${localStorage.getItem('token')}`
                 },

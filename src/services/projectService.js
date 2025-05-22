@@ -1,7 +1,7 @@
 // src/services/projectService.js
 import axios from 'axios';
 
-const API_URL = 'https://lookode-back.vercel.app';
+const API_URL = 'https://lookode-back.onrender.com';
 
 // Crear un nuevo proyecto
 const createProject = async (projectData) => {

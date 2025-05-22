@@ -28,7 +28,7 @@ const Viewproyecto = () => {
       };
       
       const response = await axios.get(
-        `https://lookode-back.vercel.app/favoritos/check/${idProyecto}`,
+        `https://lookode-back.onrender.com/favoritos/check/${idProyecto}`,
         config
       );
       
@@ -62,14 +62,14 @@ const Viewproyecto = () => {
       if (enFavoritos) {
         // Eliminar de favoritos
         await axios.delete(
-          `https://lookode-back.vercel.app/remove/${idProyecto}`,
+          `https://lookode-back.onrender.com/remove/${idProyecto}`,
           config
         );
         setEnFavoritos(false);
       } else {
         // Añadir a favoritos
         await axios.post(
-          'https://lookode-back.vercel.app/favoritos/add',
+          'https://lookode-back.onrender.com/favoritos/add',
           { idProyecto },
           config
         );
@@ -104,7 +104,7 @@ const Viewproyecto = () => {
 
         // Realizar la petición para obtener los detalles del proyecto
         const response = await axios.get(
-          `https://lookode-back.vercel.app/proyectos/${idProyecto}/detalles`, 
+          `https://lookode-back.onrender.com/proyectos/${idProyecto}/detalles`, 
           config
         );
 
@@ -121,7 +121,7 @@ const Viewproyecto = () => {
         for (const txt of txtFiles) {
           try {
             const txtResponse = await axios.get(
-              `https://lookode-back.vercel.app/${txt.idContenido}`, 
+              `https://lookode-back.onrender.com/${txt.idContenido}`, 
               {
                 ...config,
                 responseType: 'text'
@@ -201,13 +201,13 @@ const Viewproyecto = () => {
               <div className="featured-content">
                 {primerContenido.tipo === 'imagen' ? (
                   <img 
-                    src={`https://lookode-back.vercel.app/${primerContenido.idContenido}`} 
+                    src={`https://lookode-back.onrender.com/${primerContenido.idContenido}`} 
                     alt={proyecto?.titulo || 'Imagen principal'} 
                   />
                 ) : primerContenido.tipo === 'video' ? (
                   <video controls>
                     <source 
-                      src={`https://lookode-back.vercel.app/${primerContenido.idContenido}`} 
+                      src={`https://lookode-back.onrender.com/${primerContenido.idContenido}`} 
                       type="video/mp4" 
                     />
                     Tu navegador no soporta el tag de video.
@@ -220,7 +220,7 @@ const Viewproyecto = () => {
                 ) : (
                   <div className="document-preview">
                     <a 
-                      href={`https://lookode-back.vercel.app/${primerContenido.idContenido}`}
+                      href={`https://lookode-back.onrender.com/${primerContenido.idContenido}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -237,7 +237,7 @@ const Viewproyecto = () => {
                 {imagenesAdicionales.map((imagen) => (
                   <img 
                   key={imagen.idContenido}
-                  src={`https://lookode-back.vercel.app/${imagen.idContenido}`} 
+                  src={`https://lookode-back.onrender.com/${imagen.idContenido}`} 
                   alt="Imagen del proyecto" 
                   onClick={() => setImagenSeleccionada(imagen.idContenido)}
                 />
@@ -250,7 +250,7 @@ const Viewproyecto = () => {
                 <span className="close">&times;</span>
                 <img 
                   className="modal-content"
-                  src={`https://lookode-back.vercel.app/${imagenSeleccionada}`} 
+                  src={`https://lookode-back.onrender.com/${imagenSeleccionada}`} 
                   alt="Imagen en tamaño completo"
                 />
               </div>
@@ -262,7 +262,7 @@ const Viewproyecto = () => {
                 <div key={video.idContenido} className="featured-content">
                   <video controls>
                     <source 
-                      src={`https://lookode-back.vercel.app/contenidos/${video.idContenido}`} 
+                      src={`https://lookode-back.onrender.com/contenidos/${video.idContenido}`} 
                       type="video/mp4" 
                     />
                     Tu navegador no soporta el tag de video.
@@ -286,7 +286,7 @@ const Viewproyecto = () => {
               index > 0 || (index === 0 && primerContenido.tipo !== 'documento') ? (
                 <div key={documento.idContenido} className="document-preview">
                   <a 
-                    href={`https://lookode-back.vercel.app/${documento.idContenido}`}
+                    href={`https://lookode-back.onrender.com/${documento.idContenido}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -301,7 +301,7 @@ const Viewproyecto = () => {
             <div className="avatar-large">
               {usuario && (
                 <img 
-                  src={`https://lookode-back.vercel.app/usuario/avatar/${usuario.idUsuario}`} 
+                  src={`https://lookode-back.onrender.com/usuario/avatar/${usuario.idUsuario}`} 
                   alt="Avatar"
                   onError={(e) => {
                     e.target.onerror = null;

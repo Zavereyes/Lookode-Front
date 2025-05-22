@@ -17,7 +17,7 @@ function Login() {
         setError('');
         
         try {
-            const response = await axios.post('https://lookode-back.vercel.app/login', {
+            const response = await axios.post('https://lookode-back.onrender.com/login', {
                 correo: email,
                 contraseña: password
             });
@@ -43,7 +43,7 @@ function Login() {
 
     const handleReactivarCuenta = async () => {
         try {
-            const response = await axios.post('https://lookode-back.vercel.app/reactivar-cuenta', {
+            const response = await axios.post('https://lookode-back.onrender.com/reactivar-cuenta', {
                 idUsuario: idUsuario
             });
             

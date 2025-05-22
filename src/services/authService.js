@@ -2,7 +2,7 @@
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';  
 
-const API_URL = 'https://lookode-back.vercel.app';
+const API_URL = 'https://lookode-back.onrender.com';
 
 
 axios.interceptors.request.use(
