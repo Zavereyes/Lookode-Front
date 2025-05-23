@@ -62,7 +62,7 @@ const Viewproyecto = () => {
       if (enFavoritos) {
         // Eliminar de favoritos
         await axios.delete(
-          `https://lookode-back.onrender.com/remove/${idProyecto}`,
+          `https://lookode-back.onrender.com/favoritos/remove/${idProyecto}`,
           config
         );
         setEnFavoritos(false);
@@ -121,7 +121,7 @@ const Viewproyecto = () => {
         for (const txt of txtFiles) {
           try {
             const txtResponse = await axios.get(
-              `https://lookode-back.onrender.com/${txt.idContenido}`, 
+              `https://lookode-back.onrender.com/contenidos/${txt.idContenido}`, 
               {
                 ...config,
                 responseType: 'text'
@@ -201,13 +201,13 @@ const Viewproyecto = () => {
               <div className="featured-content">
                 {primerContenido.tipo === 'imagen' ? (
                   <img 
-                    src={`https://lookode-back.onrender.com/${primerContenido.idContenido}`} 
+                    src={`https://lookode-back.onrender.com/contenidos/${primerContenido.idContenido}`} 
                     alt={proyecto?.titulo || 'Imagen principal'} 
                   />
                 ) : primerContenido.tipo === 'video' ? (
                   <video controls>
                     <source 
-                      src={`https://lookode-back.onrender.com/${primerContenido.idContenido}`} 
+                      src={`https://lookode-back.onrender.com/contenidos/${primerContenido.idContenido}`} 
                       type="video/mp4" 
                     />
                     Tu navegador no soporta el tag de video.
@@ -237,7 +237,7 @@ const Viewproyecto = () => {
                 {imagenesAdicionales.map((imagen) => (
                   <img 
                   key={imagen.idContenido}
-                  src={`https://lookode-back.onrender.com/${imagen.idContenido}`} 
+                  src={`https://lookode-back.onrender.com/contenidos/${imagen.idContenido}`} 
                   alt="Imagen del proyecto" 
                   onClick={() => setImagenSeleccionada(imagen.idContenido)}
                 />
@@ -250,7 +250,7 @@ const Viewproyecto = () => {
                 <span className="close">&times;</span>
                 <img 
                   className="modal-content"
-                  src={`https://lookode-back.onrender.com/${imagenSeleccionada}`} 
+                  src={`https://lookode-back.onrender.com/contenidos/${imagenSeleccionada}`} 
                   alt="Imagen en tamaño completo"
                 />
               </div>
